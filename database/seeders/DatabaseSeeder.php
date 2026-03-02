@@ -9,30 +9,24 @@ use App\Models\Sach;
 
 class DatabaseSeeder extends Seeder
 {
-    /**
-     * Seed the application's database.
-     */
     public function run(): void
     {
-        // 1. Create an Admin User
         User::create([
             'ho_ten' => 'Admin User',
-            'email' => 'admin@example.com',
-            'mat_khau' => bcrypt('password'), // password is 'password'
+            'email' => 'admin@gmail.com',
+            'mat_khau' => bcrypt('password'), //
             'vai_tro' => 'admin',
         ]);
 
-        // 2. Create a Regular Customer
         User::create([
-            'ho_ten' => 'John Doe',
-            'email' => 'john@example.com',
+            'ho_ten' => 'Thế Minh',
+            'email' => 'theminh@gmail.com',
             'mat_khau' => bcrypt('password'),
             'vai_tro' => 'khach_hang',
-            'dia_chi' => '123 Main St, New York, NY',
+            'dia_chi' => 'TpHCM, Việt Nam',
             'so_dien_thoai' => '1234567890',
         ]);
 
-        // 3. Create Dummy Books
         $books = [
             [
                 'ten_sach' => 'Nhà Giả Kim',

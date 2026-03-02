@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('thanh_toan', function (Blueprint $table) {
             $table->id();
-            $table->string('phuong_thuc'); // e.g., 'COD', 'Banking'
+            $table->string('phuong_thuc');
             $table->string('trang_thai')->default('hoat_dong');
             $table->timestamps();
         });

@@ -10,11 +10,11 @@ class BookController extends Controller
     public function show($id)
     {
         $book = Sach::findOrFail($id);
-        
-        // Find related books (same category or random)
-        // For simplicity, just get 4 random books excluding current
+
+        // Tìm các sách random
+        // Cho ví dụ, ở đây ta lấy ngẫu nhiên 4 cuốn sách khác
         $relatedBooks = Sach::where('id', '!=', $id)->inRandomOrder()->take(4)->get();
-        
+        // Trả về view với dữ liệu sách và sách liên quan
         return view('books.show', compact('book', 'relatedBooks'));
     }
 
@@ -27,9 +27,9 @@ class BookController extends Controller
     public function search(Request $request)
     {
         $query = $request->input('query');
-        
+
         $booksQuery = Sach::where('ten_sach', 'LIKE', "%$query%")
-                          ->orWhere('tac_gia', 'LIKE', "%$query%");
+            ->orWhere('tac_gia', 'LIKE', "%$query%");
 
         if ($request->ajax() || $request->has('ajax')) {
             $books = $booksQuery->take(5)->get();

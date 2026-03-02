@@ -8,7 +8,7 @@ use Illuminate\Pagination\Paginator;
 class AppServiceProvider extends ServiceProvider
 {
     /**
-     * Register any application services.
+     * Register các dịch vụ ứng dụng.
      */
     public function register(): void
     {
@@ -16,11 +16,10 @@ class AppServiceProvider extends ServiceProvider
     }
 
     /**
-     * Bootstrap any application services.
+     * Bootstrap các dịch vụ ứng dụng.
      */
     public function boot(): void
     {
         Paginator::useBootstrapFive();
     }
-
 }
