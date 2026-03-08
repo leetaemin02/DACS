@@ -1,12 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ config('app.name', 'BookStore') }}</title>
-
+    
     <link rel="icon" href="favicon.ico" type="image/x-icon" />
 
     <!-- Fonts -->
@@ -15,17 +14,17 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
 </head>
-
 <body>
     <nav class="navbar">
         <div class="container nav-container">
             <a href="{{ route('home') }}" class="nav-logo">
                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    <path d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
                 BookStore
             </a>
-            <div class="search-container">
+            <!-- Search -->
+            <div class= "search-container">
                 <form action="{{ route('books.search') }}" method="GET" autocomplete="off">
                     <input type="text" name="query" id="live-search-input" placeholder="Tìm kiếm sách bạn yêu thích..." class="search-input" value="{{ request('query') }}">
                     <button type="submit" class="search-button">
@@ -38,10 +37,17 @@
                 <div id="search-dropdown" class="search-dropdown"></div>
             </div>
             <div class="nav-links">
-                <a href="{{ route('home') }}" class="nav-link">Trang chủ</a>
-                <a href="{{ route('books.categories') }}" class="nav-link">Thư viện</a>
-                <a href="#" class="nav-link">Giỏ hàng (0)</a>
-                <a href="#" class="nav-btn">Đăng Nhập</a>
+                <a href="{{ route('home') }}" class="nav-link">Home</a>
+                <a href="{{ route('books.categories') }}" class="nav-link">Categories</a>
+                <a href="{{ route('cart.index') }}" class="nav-link" style="display: flex; align-items: center; gap: 0.5rem;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="9" cy="21" r="1"></circle>
+                        <circle cx="20" cy="21" r="1"></circle>
+                        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                    </svg>
+                    Cart ({{ $cartCount ?? 0 }})
+                </a>
+                <a href="#" class="nav-btn">Login</a>
             </div>
         </div>
     </nav>
@@ -51,29 +57,29 @@
     </main>
 
     <footer class="main-footer">
-        <div class="container footer-grid">
-            <div class="footer-col">
-                <h4>Về BookStore</h4>
-                <p>Hệ thống bán sách trực tuyến hàng đầu, cung cấp hàng ngàn đầu sách đa dạng thể loại.</p>
-            </div>
-            <div class="footer-col">
-                <h4>Liên kết nhanh</h4>
-                <ul>
-                    <li><a href="{{ route('home') }}">Trang chủ</a></li>
-                    <li><a href="{{ route('books.categories') }}">Danh mục</a></li>
-                    <li><a href="#">Điều khoản dịch vụ</a></li>
-                </ul>
-            </div>
-            <div class="footer-col">
-                <h4>Liên hệ</h4>
-                <p>📧 Email: support@bookstore.vn</p>
-                <p>📞 Hotline: 1900 1234</p>
-                <p>📍 Địa chỉ: TP. Hồ Chí Minh, Việt Nam</p>
-            </div>
+    <div class="container footer-grid">
+        <div class="footer-col">
+            <h4>Về BookStore</h4>
+            <p>Hệ thống bán sách trực tuyến hàng đầu, cung cấp hàng ngàn đầu sách đa dạng thể loại.</p>
         </div>
-        <div class="footer-bottom">
-            <p>&copy; {{ date('Y') }} BookStore Project.</p>
+        <div class="footer-col">
+            <h4>Liên kết nhanh</h4>
+            <ul>
+                <li><a href="{{ route('home') }}">Trang chủ</a></li>
+                <li><a href="{{ route('books.categories') }}">Danh mục</a></li>
+                <li><a href="#">Điều khoản dịch vụ</a></li>
+            </ul>
         </div>
+        <div class="footer-col">
+            <h4>Liên hệ</h4>
+            <p>📧 Email: support@bookstore.vn</p>
+            <p>📞 Hotline: 1900 1234</p>
+            <p>📍 Địa chỉ: TP. Hồ Chí Minh, Việt Nam</p>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>&copy; {{ date('Y') }} BookStore Project. Designed for IT Subject.</p>
+    </div>
     </footer>
 
     <script>
@@ -129,6 +135,6 @@
             });
         });
     </script>
+    @stack('scripts')
 </body>
-
 </html>

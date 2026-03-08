@@ -30,10 +30,14 @@
                 {{ $book->mo_ta ?? 'No description available for this book.' }}
             </p>
 
-            <div style="display: flex; gap: 1rem; margin-bottom: 3rem;">
-                <input type="number" min="1" value="1" style="width: 80px; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: var(--radius); font-size: 1rem;">
-                <button class="nav-btn" style="flex: 1;">Thêm vào giỏ hàng</button>
-            </div>
+            <form action="{{ route('cart.add') }}" method="POST">
+                @csrf
+                <input type="hidden" name="sach_id" value="{{ $book->id }}">
+                <div style="display: flex; gap: 1rem; margin-bottom: 3rem;">
+                    <input type="number" name="so_luong" min="1" value="1" style="width: 80px; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: var(--radius); font-size: 1rem;">
+                    <button type="submit" class="nav-btn" style="flex: 1;">Thêm vào giỏ hàng</button>
+                </div>
+            </form>
 
             <div style="padding-top: 2rem; border-top: 1px solid var(--border-color);">
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
