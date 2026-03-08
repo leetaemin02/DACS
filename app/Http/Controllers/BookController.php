@@ -12,8 +12,8 @@ class BookController extends Controller
         $book = Sach::findOrFail($id);
 
         // Tìm các sách random
-        // Cho ví dụ, ở đây ta lấy ngẫu nhiên 4 cuốn sách khác
-        $relatedBooks = Sach::where('id', '!=', $id)->inRandomOrder()->take(4)->get();
+        // Cho ví dụ, ở đây ta lấy ngẫu nhiên 3 cuốn sách khác
+        $relatedBooks = Sach::where('id', '!=', $id)->inRandomOrder()->take(3)->get();
         // Trả về view với dữ liệu sách và sách liên quan
         return view('books.show', compact('book', 'relatedBooks'));
     }

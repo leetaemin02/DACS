@@ -37,58 +37,6 @@
                 <a href="{{ route('books.show', $book->id) }}" style="position:absolute; top:0; left:0; width:100%; height:100%; z-index:1;"></a>
             </div>
             @endforeach
-
-            <!-- Placeholder items if empty (remove in production) -->
-            @if($books->isEmpty())
-            <div class="book-card">
-                <div class="book-image">
-                    <!-- Placeholder image -->
-                    <img src="https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&q=80&w=800" style="width:100%; height:100%; object-fit:cover;" alt="Book">
-                </div>
-                <div class="book-content">
-                    <div class="book-category">Bestseller</div>
-                    <h3 class="book-title">The Art of Code</h3>
-                    <p class="book-author">Alan Turing</p>
-
-                    <div class="book-price">
-                        <span>$29.99</span>
-                        <button class="add-to-cart-btn">Add to Cart</button>
-                    </div>
-                </div>
-            </div>
-            <div class="book-card">
-                <div class="book-image">
-                    <!-- Placeholder image -->
-                    <img src="https://images.unsplash.com/photo-1543002588-bfa74002ed7e?auto=format&fit=crop&q=80&w=800" style="width:100%; height:100%; object-fit:cover;" alt="Book">
-                </div>
-                <div class="book-content">
-                    <div class="book-category">New Arrival</div>
-                    <h3 class="book-title">Silent Spring</h3>
-                    <p class="book-author">Rachel Carson</p>
-
-                    <div class="book-price">
-                        <span>$15.50</span>
-                        <button class="add-to-cart-btn">Add to Cart</button>
-                    </div>
-                </div>
-            </div>
-            <div class="book-card">
-                <div class="book-image">
-                    <!-- Placeholder image -->
-                    <img src="https://images.unsplash.com/photo-1532012197267-da84d127e765?auto=format&fit=crop&q=80&w=800" style="width:100%; height:100%; object-fit:cover;" alt="Book">
-                </div>
-                <div class="book-content">
-                    <div class="book-category">Classic</div>
-                    <h3 class="book-title">1984</h3>
-                    <p class="book-author">George Orwell</p>
-
-                    <div class="book-price">
-                        <span>$12.00</span>
-                        <button class="add-to-cart-btn">Add to Cart</button>
-                    </div>
-                </div>
-            </div>
-            @endif
         </div>
     </section>
 </div>
