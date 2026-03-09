@@ -33,13 +33,15 @@ class User extends Authenticatable
         return $this->mat_khau;
     }
 
-    protected function casts(): array
-    {
-        return [
-            'email_verified_at' => 'datetime',
-            'mat_khau' => 'hashed',
-        ];
-    }
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array<string,string>
+     */
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'mat_khau' => 'hashed',
+    ];
 
     public function donHangs()
     {

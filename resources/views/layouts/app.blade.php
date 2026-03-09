@@ -41,7 +41,8 @@
                 <a href="{{ route('home') }}" class="nav-link">Trang chủ</a>
                 <a href="{{ route('books.categories') }}" class="nav-link">Thư viện</a>
                 <a href="#" class="nav-link">Giỏ hàng (0)</a>
-                <a href="#" class="nav-btn">Đăng Nhập</a>
+                <a href="{{ route('login') }}" class="nav-btn">Đăng Nhập</a>
+                <a href="{{ route('register') }}" class="nav-link">Đăng Ký</a>
             </div>
         </div>
     </nav>
