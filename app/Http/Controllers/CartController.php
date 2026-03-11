@@ -118,4 +118,66 @@ class CartController extends Controller
 
         return redirect()->route('cart.index')->with('success', 'Đã xóa sách khỏi giỏ hàng!');
     }
+
+    // --- API Methods ---
+
+    public function apiAdd(Request $request)
+    {
+        $request->validate([
+            'sach_id' => 'required|exists:sach,id',
+            'so_luong' => 'required|integer|min:1'
+        ]);
+
+        $sach_id = $request->sach_id;
+        $so_luong = $request->so_luong;
+
+        if (Auth::check()) {
+            $cartItem = GioHang::where('nguoi_dung_id', Auth::id())
+                ->where('sach_id', $sach_id)
+                ->first();
+
+            if ($cartItem) {
+                $cartItem->so_luong += $so_luong;
+                $cartItem->save();
+            } else {
+                GioHang::create([
+                    'nguoi_dung_id' => Auth::id(),
+                    'sach_id' => $sach_id,
+                    'so_luong' => $so_luong
+                ]);
+            }
+        } else {
+            $cart = session()->get('cart', []);
+            if (isset($cart[$sach_id])) {
+                $cart[$sach_id]['so_luong'] += $so_luong;
+            } else {
+                $cart[$sach_id] = ['so_luong' => $so_luong];
+            }
+            session()->put('cart', $cart);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Đã thêm vào giỏ hàng!',
+            'count' => Auth::check() ? GioHang::where('nguoi_dung_id', Auth::id())->sum('so_luong') : array_sum(array_column(session()->get('cart', []), 'so_luong'))
+        ]);
+    }
+
+    public function apiRemove(Request $request, $id)
+    {
+        if (Auth::check()) {
+            GioHang::where('nguoi_dung_id', Auth::id())->where('id', $id)->delete();
+        } else {
+            $cart = session()->get('cart', []);
+            if (isset($cart[$id])) {
+                unset($cart[$id]);
+                session()->put('cart', $cart);
+            }
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Đã xóa khỏi giỏ hàng!'
+        ]);
+    }
 }

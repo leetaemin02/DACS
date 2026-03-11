@@ -82,8 +82,45 @@
     </div>
     </footer>
 
+    <div id="toast-container" style="position: fixed; top: 1.5rem; right: 1.5rem; z-index: 9999; display: flex; flex-direction: column; gap: 0.75rem;"></div>
+
     <script>
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            const bgColor = type === 'success' ? '#10b981' : '#ef4444';
+            
+            toast.style.cssText = `
+                background: ${bgColor};
+                color: white;
+                padding: 1rem 1.5rem;
+                border-radius: 0.75rem;
+                box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+                min-width: 300px;
+                animation: slideIn 0.3s ease-out forwards;
+            `;
+            
+            toast.innerHTML = `
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+                <span style="font-weight: 500;">${message}</span>
+            `;
+            
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = 'fadeOut 0.3s ease-in forwards';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
+
             const searchInput = document.getElementById('live-search-input');
             const dropdown = document.getElementById('search-dropdown');
             let timeout = null;

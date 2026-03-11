@@ -30,11 +30,11 @@
                 {{ $book->mo_ta ?? 'No description available for this book.' }}
             </p>
 
-            <form action="{{ route('cart.add') }}" method="POST">
+            <form id="add-to-cart-form">
                 @csrf
-                <input type="hidden" name="sach_id" value="{{ $book->id }}">
+                <input type="hidden" name="sach_id" id="sach_id" value="{{ $book->id }}">
                 <div style="display: flex; gap: 1rem; margin-bottom: 3rem;">
-                    <input type="number" name="so_luong" min="1" value="1" style="width: 80px; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: var(--radius); font-size: 1rem;">
+                    <input type="number" name="so_luong" id="so_luong" min="1" value="1" style="width: 80px; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: var(--radius); font-size: 1rem;">
                     <button type="submit" class="nav-btn" style="flex: 1;">Thêm vào giỏ hàng</button>
                 </div>
             </form>
@@ -87,4 +87,59 @@
     </section>
     @endif
 </div>
+@push('scripts')
+<script>
+document.getElementById('add-to-cart-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const sach_id = document.getElementById('sach_id').value;
+    const so_luong = document.getElementById('so_luong').value;
+    const btn = this.querySelector('button');
+    const originalText = btn.innerHTML;
+    
+    btn.disabled = true;
+    btn.innerHTML = 'Đang thêm...';
+
+    fetch('{{ route("api.cart.add") }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({
+            sach_id: sach_id,
+            so_luong: so_luong
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if(data.success) {
+            showToast(data.message);
+            // Cập nhật số lượng trên header nếu có
+            const cartBadge = document.querySelector('.nav-link[href*="cart"]');
+            if(cartBadge) {
+                cartBadge.innerHTML = `
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="9" cy="21" r="1"></circle>
+                        <circle cx="20" cy="21" r="1"></circle>
+                        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                    </svg>
+                    Cart (${data.count})
+                `;
+            }
+        } else {
+            showToast(data.message || 'Có lỗi xảy ra khi thêm vào giỏ hàng!', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showToast('Có lỗi xảy ra, vui lòng thử lại!', 'error');
+    })
+    .finally(() => {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+    });
+});
+</script>
+@endpush
 @endsection
