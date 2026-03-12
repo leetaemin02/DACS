@@ -47,7 +47,28 @@
                     </svg>
                     Cart ({{ $cartCount ?? 0 }})
                 </a>
-                <a href="#" class="nav-btn">Login</a>
+                @guest
+                    <a href="{{ route('login') }}" class="nav-btn">Đăng Nhập</a>
+                @endguest
+
+                @auth
+                    <div class="user-dropdown">
+                        <div class="nav-link user-dropdown-toggle">
+                            Xin chào, <b>{{ Auth::user()->ho_ten }}</b> 
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                        </div>
+                        
+                        <div class="user-dropdown-menu">
+                            <a href="#" class="user-dropdown-item">Thông tin tài khoản</a>
+                            <a href="#" class="user-dropdown-item">Đơn hàng của tôi</a>
+                            
+                            <form action="{{ route('logout') }}" method="POST" style="margin: 0;">
+                                @csrf
+                                <button type="submit" class="user-dropdown-item text-danger">Đăng xuất</button>
+                            </form>
+                        </div>
+                    </div>
+                @endauth
             </div>
         </div>
     </nav>
