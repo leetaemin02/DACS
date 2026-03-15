@@ -83,7 +83,10 @@
                         <span style="font-weight: 700; font-size: 1.25rem;">Tổng cộng</span>
                         <span style="font-weight: 700; font-size: 1.25rem; color: var(--primary-color);" id="cart-total">{{ number_format($total, 3) }}đ</span>
                     </div>
-                    <button class="nav-btn" style="width: 100%; padding: 1rem;">Tiến hành thanh toán</button>
+                    <form action="{{ route('vnpay.payment') }}" method="POST">
+                        @csrf
+                        <button type="submit" class="nav-btn" style="width: 100%; padding: 1rem; background-color: #005A9E; color: white;">Thanh Toán VNPAY</button>
+                    </form>
                     <a href="{{ route('books.categories') }}" style="display: block; text-align: center; margin-top: 1rem; color: var(--text-secondary); text-decoration: none;">Tiếp tục mua sắm</a>
                 </div>
             </div>

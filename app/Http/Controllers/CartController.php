@@ -11,29 +11,11 @@ class CartController extends Controller
 {
     public function index()
     {
-        $cartItems = [];
+        $cartItems = GioHang::with('sach')->where('nguoi_dung_id', Auth::id())->get();
         $total = 0;
 
-        if (Auth::check()) {
-            $cartItems = GioHang::with('sach')->where('nguoi_dung_id', Auth::id())->get();
-            foreach ($cartItems as $item) {
-                $total += $item->sach->gia * $item->so_luong;
-            }
-        } else {
-            $cart = session()->get('cart', []);
-            $sachIds = array_keys($cart);
-            $sachers = Sach::whereIn('id', $sachIds)->get()->keyBy('id');
-
-            foreach ($cart as $id => $details) {
-                if (isset($sachers[$id])) {
-                    $cartItems[] = (object)[
-                        'id' => $id,
-                        'sach' => $sachers[$id],
-                        'so_luong' => $details['so_luong']
-                    ];
-                    $total += $sachers[$id]->gia * $details['so_luong'];
-                }
-            }
+        foreach ($cartItems as $item) {
+            $total += $item->sach->gia * $item->so_luong;
         }
 
         return view('cart.index', compact('cartItems', 'total'));
@@ -49,33 +31,19 @@ class CartController extends Controller
         $sach_id = $request->sach_id;
         $so_luong = $request->so_luong;
 
-        if (Auth::check()) {
-            $cartItem = GioHang::where('nguoi_dung_id', Auth::id())
-                ->where('sach_id', $sach_id)
-                ->first();
+        $cartItem = GioHang::where('nguoi_dung_id', Auth::id())
+            ->where('sach_id', $sach_id)
+            ->first();
 
-            if ($cartItem) {
-                $cartItem->so_luong += $so_luong;
-                $cartItem->save();
-            } else {
-                GioHang::create([
-                    'nguoi_dung_id' => Auth::id(),
-                    'sach_id' => $sach_id,
-                    'so_luong' => $so_luong
-                ]);
-            }
+        if ($cartItem) {
+            $cartItem->so_luong += $so_luong;
+            $cartItem->save();
         } else {
-            $cart = session()->get('cart', []);
-
-            if (isset($cart[$sach_id])) {
-                $cart[$sach_id]['so_luong'] += $so_luong;
-            } else {
-                $cart[$sach_id] = [
-                    'so_luong' => $so_luong
-                ];
-            }
-
-            session()->put('cart', $cart);
+            GioHang::create([
+                'nguoi_dung_id' => Auth::id(),
+                'sach_id' => $sach_id,
+                'so_luong' => $so_luong
+            ]);
         }
 
         return redirect()->back()->with('success', 'Đã thêm sách vào giỏ hàng!');
@@ -87,18 +55,10 @@ class CartController extends Controller
             'so_luong' => 'required|integer|min:1'
         ]);
 
-        if (Auth::check()) {
-            $cartItem = GioHang::where('nguoi_dung_id', Auth::id())->where('id', $id)->first();
-            if ($cartItem) {
-                $cartItem->so_luong = $request->so_luong;
-                $cartItem->save();
-            }
-        } else {
-            $cart = session()->get('cart', []);
-            if (isset($cart[$id])) {
-                $cart[$id]['so_luong'] = $request->so_luong;
-                session()->put('cart', $cart);
-            }
+        $cartItem = GioHang::where('nguoi_dung_id', Auth::id())->where('id', $id)->first();
+        if ($cartItem) {
+            $cartItem->so_luong = $request->so_luong;
+            $cartItem->save();
         }
 
         return redirect()->route('cart.index')->with('success', 'Giỏ hàng đã được cập nhật!');
@@ -106,15 +66,7 @@ class CartController extends Controller
 
     public function remove($id)
     {
-        if (Auth::check()) {
-            GioHang::where('nguoi_dung_id', Auth::id())->where('id', $id)->delete();
-        } else {
-            $cart = session()->get('cart', []);
-            if (isset($cart[$id])) {
-                unset($cart[$id]);
-                session()->put('cart', $cart);
-            }
-        }
+        GioHang::where('nguoi_dung_id', Auth::id())->where('id', $id)->delete();
 
         return redirect()->route('cart.index')->with('success', 'Đã xóa sách khỏi giỏ hàng!');
     }
@@ -131,49 +83,31 @@ class CartController extends Controller
         $sach_id = $request->sach_id;
         $so_luong = $request->so_luong;
 
-        if (Auth::check()) {
-            $cartItem = GioHang::where('nguoi_dung_id', Auth::id())
-                ->where('sach_id', $sach_id)
-                ->first();
+        $cartItem = GioHang::where('nguoi_dung_id', Auth::id())
+            ->where('sach_id', $sach_id)
+            ->first();
 
-            if ($cartItem) {
-                $cartItem->so_luong += $so_luong;
-                $cartItem->save();
-            } else {
-                GioHang::create([
-                    'nguoi_dung_id' => Auth::id(),
-                    'sach_id' => $sach_id,
-                    'so_luong' => $so_luong
-                ]);
-            }
+        if ($cartItem) {
+            $cartItem->so_luong += $so_luong;
+            $cartItem->save();
         } else {
-            $cart = session()->get('cart', []);
-            if (isset($cart[$sach_id])) {
-                $cart[$sach_id]['so_luong'] += $so_luong;
-            } else {
-                $cart[$sach_id] = ['so_luong' => $so_luong];
-            }
-            session()->put('cart', $cart);
+            GioHang::create([
+                'nguoi_dung_id' => Auth::id(),
+                'sach_id' => $sach_id,
+                'so_luong' => $so_luong
+            ]);
         }
 
         return response()->json([
             'success' => true,
             'message' => 'Đã thêm vào giỏ hàng!',
-            'count' => Auth::check() ? GioHang::where('nguoi_dung_id', Auth::id())->sum('so_luong') : array_sum(array_column(session()->get('cart', []), 'so_luong'))
+            'count' => GioHang::where('nguoi_dung_id', Auth::id())->sum('so_luong')
         ]);
     }
 
     public function apiRemove(Request $request, $id)
     {
-        if (Auth::check()) {
-            GioHang::where('nguoi_dung_id', Auth::id())->where('id', $id)->delete();
-        } else {
-            $cart = session()->get('cart', []);
-            if (isset($cart[$id])) {
-                unset($cart[$id]);
-                session()->put('cart', $cart);
-            }
-        }
+        GioHang::where('nguoi_dung_id', Auth::id())->where('id', $id)->delete();
 
         return response()->json([
             'success' => true,

@@ -40,7 +40,7 @@ class AuthController extends Controller
     {
         $request->validate([
             'ho_ten' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:nguoi_dung'],
             'mat_khau' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
 

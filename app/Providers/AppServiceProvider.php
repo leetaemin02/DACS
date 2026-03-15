@@ -36,10 +36,7 @@ class AppServiceProvider extends ServiceProvider
         View::composer('*', function ($view) {
             $cartCount = 0;
             if (Auth::check()) {
-                $cartCount = GioHang::where('nguoi_dung_id', Auth::id())->count();
-            } else {
-                $cart = session()->get('cart', []);
-                $cartCount = count($cart);
+                $cartCount = GioHang::where('nguoi_dung_id', Auth::id())->sum('so_luong');
             }
             $view->with('cartCount', $cartCount);
         });

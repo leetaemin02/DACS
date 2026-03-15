@@ -3,6 +3,24 @@
 @section('content')
 <div class="container">
     <h1>Thư viện</h1>
+    <!-- Filter by category -->
+    <div class="filter-mini-wrapper">
+    <form method="GET" action="{{ route('books.categories') }}" class="filter-mini">
+    <select name="price">
+        <option value="">Lọc giá</option>
+        <option value="low" {{ request('price') == 'low' ? 'selected' : '' }}>Dưới 50k</option>
+        <option value="medium" {{ request('price') == 'medium' ? 'selected' : '' }}>50k - 100k</option>
+        <option value="high" {{ request('price') == 'high' ? 'selected' : '' }}>Trên 100k</option>
+    </select>
+    <select name="sort">
+        <option value="">Sắp xếp</option>
+        <option value="bestseller" {{ request('sort') == 'bestseller' ? 'selected' : '' }}>Bán chạy</option>
+        <option value="new" {{ request('sort') == 'new' ? 'selected' : '' }}>Mới nhất</option>
+    </select>
+    <button type="submit">Lọc</button>
+    </form>
+    </div>
+
     <div class="book-grid">
         @foreach($books as $book)
         <div class="book-card">

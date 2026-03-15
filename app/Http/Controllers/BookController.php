@@ -7,6 +7,34 @@ use App\Models\Sach;
 
 class BookController extends Controller
 {
+    public function categories(Request $request)
+    {
+        $query = Sach::query();
+
+        if ($request->price == 'low') {
+            $query->where('gia','<',50);
+        }
+
+        if ($request->price == 'medium') {
+            $query->whereBetween('gia',[50,100]);
+        }
+
+        if ($request->price == 'high') {
+            $query->where('gia','>',100);
+        }
+
+        if ($request->sort == 'bestseller') {
+            $query->orderBy('so_luong','desc');
+        }
+
+        if ($request->sort == 'new') {
+            $query->orderBy('created_at','desc');
+        }
+
+        $books = $query->paginate(9)->withQueryString();
+        return view('books.categories', compact('books'));
+    }
+
     public function show($id)
     {
         $book = Sach::findOrFail($id);
@@ -16,12 +44,6 @@ class BookController extends Controller
         $relatedBooks = Sach::where('id', '!=', $id)->inRandomOrder()->take(3)->get();
         // Trả về view với dữ liệu sách và sách liên quan
         return view('books.show', compact('book', 'relatedBooks'));
-    }
-
-    public function categories()
-    {
-        $books = Sach::paginate(9);
-        return view('books.categories', compact('books'));
     }
 
     public function search(Request $request)
