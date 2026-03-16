@@ -20,10 +20,10 @@
                 Chi tiết
             </div>
             <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem; line-height: 1.1;">{{ $book->ten_sach }}</h1>
-            <p style="font-size: 1.25rem; color: var(--text-secondary); margin-bottom: 2rem;">bởi {{ $book->tac_gia }}</p>
+            <p style="font-size: 1.25rem; color: var(--text-secondary); margin-bottom: 2rem;">bởi {{ $book->tacGias->pluck('ten_tac_gia')->implode(', ') }}</p>
 
-            <div style="font-size: 2rem; font-weight: 700; color: var(--text-primary); margin-bottom: 2rem;">
-                {{ number_format($book->gia, 3) }}đ
+            <div style="font-size: 2rem; font-weight: 700; color:#ff0000; margin-bottom: 2rem;">
+                {{ number_format($book->gia, 0) }}đ
             </div>
 
             <p style="margin-bottom: 2rem; color: var(--text-secondary); line-height: 1.8;">
@@ -43,7 +43,7 @@
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                     <div>
                         <span style="color: var(--text-secondary); display: block; font-size: 0.875rem;">Thể loại</span>
-                        <span style="font-weight: 600;">Viễn tưởng</span>
+                        <span style="font-weight: 600;">{{ $book->the_loai }}</span>
                     </div>
                     <div>
                         <span style="color: var(--text-secondary); display: block; font-size: 0.875rem;">Trạng thái</span>
@@ -73,11 +73,11 @@
                 <div class="book-content">
                     <div class="book-category">Gợi ý cho bạn</div>
                     <h3 class="book-title">{{ $related->ten_sach }}</h3>
-                    <p class="book-author">{{ $related->tac_gia }}</p>
+                    <p class="book-author">{{ $related->tacGias->pluck('ten_tac_gia')->implode(', ') }}</p>
 
                     <div class="book-price">
-                        <span>{{ number_format($related->gia, 3) }}đ</span>
-                        <button class="add-to-cart-btn">Xem chi tiết</button>
+                        <span style="color: #ff0000">{{ number_format($related->gia,0) }}đ</span>
+                        <button class="add-to-cart-btn" data-id="{{ $related->id }}" style="position: relative; z-index: 2;">Thêm vào giỏ hàng</button>
                     </div>
                 </div>
                 <a href="{{ route('books.show', $related->id) }}" style="position:absolute; top:0; left:0; width:100%; height:100%; z-index:1;"></a>
@@ -89,56 +89,92 @@
 </div>
 @push('scripts')
 <script>
-document.getElementById('add-to-cart-form').addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    const sach_id = document.getElementById('sach_id').value;
-    const so_luong = document.getElementById('so_luong').value;
-    const btn = this.querySelector('button');
-    const originalText = btn.innerHTML;
-    
-    btn.disabled = true;
-    btn.innerHTML = 'Đang thêm...';
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle main form
+    const mainForm = document.getElementById('add-to-cart-form');
+    if (mainForm) {
+        mainForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            @if(!Auth::check())
+                window.location.href = "{{ route('login') }}";
+                return;
+            @endif
 
-    fetch('{{ route("api.cart.add") }}', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-        },
-        body: JSON.stringify({
-            sach_id: sach_id,
-            so_luong: so_luong
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if(data.success) {
-            showToast(data.message);
-            // Cập nhật số lượng trên header nếu có
-            const cartBadge = document.querySelector('.nav-link[href*="cart"]');
-            if(cartBadge) {
-                cartBadge.innerHTML = `
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="9" cy="21" r="1"></circle>
-                        <circle cx="20" cy="21" r="1"></circle>
-                        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-                    </svg>
-                    Cart (${data.count})
-                `;
-            }
-        } else {
-            showToast(data.message || 'Có lỗi xảy ra khi thêm vào giỏ hàng!', 'error');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        showToast('Có lỗi xảy ra, vui lòng thử lại!', 'error');
-    })
-    .finally(() => {
-        btn.disabled = false;
-        btn.innerHTML = originalText;
+            const sach_id = document.getElementById('sach_id').value;
+            const so_luong = document.getElementById('so_luong').value;
+            const btn = this.querySelector('button');
+            const originalText = btn.innerHTML;
+            
+            btn.disabled = true;
+            btn.innerHTML = 'Đang thêm...';
+
+            addToCartAjax(sach_id, so_luong, btn, originalText);
+        });
+    }
+
+    // Handle related books
+    const relatedBtns = document.querySelectorAll('.add-to-cart-btn[data-id]');
+    relatedBtns.forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            @if(!Auth::check())
+                window.location.href = "{{ route('login') }}";
+                return;
+            @endif
+
+            const bookId = this.getAttribute('data-id');
+            const originalText = this.innerHTML;
+            
+            this.disabled = true;
+            this.innerHTML = '...';
+
+            addToCartAjax(bookId, 1, this, originalText);
+        });
     });
+
+    function addToCartAjax(sach_id, so_luong, btn, originalText) {
+        fetch('{{ route("api.cart.add") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({
+                sach_id: sach_id,
+                so_luong: so_luong
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if(data.success) {
+                showToast(data.message);
+                const cartBadge = document.querySelector('.nav-link[href*="cart"]');
+                if(cartBadge) {
+                    cartBadge.innerHTML = `
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="9" cy="21" r="1"></circle>
+                            <circle cx="20" cy="21" r="1"></circle>
+                            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 0 0 0 2-1.61L23 6H6"></path>
+                        </svg>
+                        Cart (${data.count})
+                    `;
+                }
+            } else {
+                showToast(data.message || 'Có lỗi xảy ra!', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showToast('Có lỗi xảy ra, vui lòng thử lại!', 'error');
+        })
+        .finally(() => {
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+        });
+    }
 });
 </script>
 @endpush

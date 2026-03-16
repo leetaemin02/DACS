@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Sach;
 use App\Models\DonHang;
+use App\Models\TacGia;
 use Illuminate\Support\Facades\DB;
 
 class AdminController extends Controller
@@ -36,13 +37,14 @@ class AdminController extends Controller
     // --- Quản lý sản phẩm ---
     public function products()
     {
-        $products = Sach::latest()->paginate(10);
+        $products = Sach::with('tacGias')->latest()->paginate(10);
         return view('admin.products.index', compact('products'));
     }
 
     public function createProduct()
     {
-        return view('admin.products.create');
+        $authors = TacGia::orderBy('ten_tac_gia')->get();
+        return view('admin.products.create', compact('authors'));
     }
 
     public function storeProduct(Request $request)
@@ -50,11 +52,47 @@ class AdminController extends Controller
         $request->validate([
             'ten_sach' => 'required',
             'gia' => 'required|numeric',
-            // ... các validate khác
+            'authors' => 'nullable|array',
+            'authors.*' => 'exists:tac_gia,id'
         ]);
 
-        Sach::create($request->all());
+        $product = Sach::create($request->except('authors'));
+        
+        if ($request->has('authors')) {
+            $product->tacGias()->sync($request->authors);
+        }
+
         return redirect()->route('admin.products')->with('success', 'Thêm sản phẩm thành công');
+    }
+
+    public function editProduct(Request $request, $id)
+    {
+        $product = Sach::with('tacGias')->findOrFail($id);
+        $authors = TacGia::orderBy('ten_tac_gia')->get();
+        $currentPage = $request->input('page', 1);
+        return view('admin.products.edit', compact('product', 'authors', 'currentPage'));
+    }
+
+    public function updateProduct(Request $request, $id)
+    {
+        $request->validate([
+            'ten_sach' => 'required',
+            'gia' => 'required|numeric',
+            'authors' => 'nullable|array',
+            'authors.*' => 'exists:tac_gia,id'
+        ]);
+
+        $product = Sach::findOrFail($id);
+        $product->update($request->except('authors'));
+
+        if ($request->has('authors')) {
+            $product->tacGias()->sync($request->authors);
+        } else {
+            $product->tacGias()->detach();
+        }
+
+        $currentPage = $request->input('page', 1);
+        return redirect()->route('admin.products', ['page' => $currentPage])->with('success', 'Cập nhật sản phẩm thành công');
     }
 
     // --- Quản lý đơn hàng ---

@@ -8,7 +8,7 @@
 <div class="stats-grid">
     <div class="stat-card">
         <div class="stat-label">Tổng doanh thu</div>
-        <div class="stat-value">{{ number_format($totalRevenue, 3) }}đ</div>
+        <div class="stat-value">{{ number_format($totalRevenue, 0) }}đ</div>
     </div>
     <div class="stat-card">
         <div class="stat-label">Tổng đơn hàng</div>
@@ -37,7 +37,7 @@
             @foreach($monthlyRevenue as $item)
             <tr>
                 <td>Tháng {{ $item->month }}</td>
-                <td>{{ number_format($item->total, 3) }}đ</td>
+                <td>{{ number_format($item->total, 0) }}đ</td>
             </tr>
             @endforeach
         </tbody>

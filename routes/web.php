@@ -67,6 +67,8 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::get('/products', [AdminController::class, 'products'])->name('products');
     Route::get('/products/create', [AdminController::class, 'createProduct'])->name('products.create');
     Route::post('/products/store', [AdminController::class, 'storeProduct'])->name('products.store');
+    Route::get('/products/edit/{id}', [AdminController::class, 'editProduct'])->name('products.edit');
+    Route::post('/products/update/{id}', [AdminController::class, 'updateProduct'])->name('products.update');
     
     // Quản lý đơn hàng
     Route::get('/orders', [AdminController::class, 'orders'])->name('orders');

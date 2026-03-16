@@ -25,7 +25,7 @@
                     <div style="font-weight: 600;">{{ $order->nguoiDung->ho_ten ?? 'N/A' }}</div>
                     <div style="font-size: 0.75rem; color: var(--secondary);">{{ $order->nguoiDung->email ?? '' }}</div>
                 </td>
-                <td style="font-weight: 700;">{{ number_format($order->tong_tien, 3) }}đ</td>
+                <td style="font-weight: 700;">{{ number_format($order->tong_tien, 0) }}đ</td>
                 <td>{{ $order->thanhToan->phuong_thuc ?? 'N/A' }}</td>
                 <td>
                     <span style="padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.75rem; font-weight: 700; 
@@ -52,8 +52,8 @@
         </tbody>
     </table>
     
-    <div style="margin-top: 1.5rem;">
-        {{ $orders->links() }}
+    <div class="pagination-container">
+        {{ $orders->onEachSide(1)->links() }}
     </div>
 </div>
 @endsection

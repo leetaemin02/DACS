@@ -11,7 +11,7 @@ class CartController extends Controller
 {
     public function index()
     {
-        $cartItems = GioHang::with('sach')->where('nguoi_dung_id', Auth::id())->get();
+        $cartItems = GioHang::with('sach.tacGias')->where('nguoi_dung_id', Auth::id())->get();
         $total = 0;
 
         foreach ($cartItems as $item) {

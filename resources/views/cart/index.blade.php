@@ -39,10 +39,10 @@
                                     </div>
                                     <div>
                                         <div style="font-weight: 600; font-size: 1.125rem;">{{ $item->sach->ten_sach }}</div>
-                                        <div style="font-size: 0.875rem; color: var(--text-secondary);">bởi {{ $item->sach->tac_gia }}</div>
+                                        <div style="font-size: 0.875rem; color: var(--text-secondary);">bởi {{ $item->sach->tacGias->pluck('ten_tac_gia')->implode(', ') }}</div>
                                     </div>
                                 </td>
-                                <td style="padding: 1.5rem 0;" class="item-price" data-price="{{ $item->sach->gia }}">{{ number_format($item->sach->gia, 3) }}đ</td>
+                                <td style="padding: 1.5rem 0;" class="item-price" data-price="{{ $item->sach->gia }}">{{ number_format($item->sach->gia, 0) }}đ</td>
                                 <td style="padding: 1.5rem 0;">
                                     <form action="{{ route('cart.update', $item->id) }}" method="POST" style="display: flex; align-items: center; gap: 0.5rem;">
                                         @csrf
@@ -52,7 +52,7 @@
                                                style="width: 60px; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 0.25rem;">
                                     </form>
                                 </td>
-                                <td style="padding: 1.5rem 0; font-weight: 600;" class="item-line-total">{{ number_format($item->sach->gia * $item->so_luong, 3) }}đ</td>
+                                <td style="padding: 1.5rem 0; font-weight: 600;" class="item-line-total">{{ number_format($item->sach->gia * $item->so_luong, 0) }}đ</td>
                                 <td style="padding: 1.5rem 0; text-align: right;">
                                     <form action="{{ route('cart.remove', $item->id) }}" method="POST">
                                         @csrf
@@ -77,7 +77,7 @@
                     <h2 style="font-size: 1.5rem; margin-bottom: 1.5rem;">Tổng đơn hàng</h2>
                     <div style="display: flex; justify-content: space-between; margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem;">
                         <span style="color: var(--text-secondary);">Tạm tính</span>
-                        <span style="font-weight: 600;" id="cart-subtotal">{{ number_format($total, 3) }}đ</span>
+                        <span style="font-weight: 600;" id="cart-subtotal">{{ number_format($total, 0) }}đ</span>
                     </div>
                     <div style="display: flex; justify-content: space-between; margin-bottom: 2rem;">
                         <span style="font-weight: 700; font-size: 1.25rem;">Tổng cộng</span>

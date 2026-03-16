@@ -33,8 +33,8 @@
         </tbody>
     </table>
     
-    <div style="margin-top: 1.5rem;">
-        {{ $users->links() }}
+    <div class="pagination-container">
+        {{ $users->onEachSide(1)->links() }}
     </div>
 </div>
 @endsection

@@ -9,18 +9,18 @@ class BookController extends Controller
 {
     public function categories(Request $request)
     {
-        $query = Sach::query();
+        $query = Sach::with('tacGias');
 
         if ($request->price == 'low') {
-            $query->where('gia','<',50);
+            $query->where('gia','<',50000);
         }
 
         if ($request->price == 'medium') {
-            $query->whereBetween('gia',[50,100]);
+            $query->whereBetween('gia',[50000,100000]);
         }
 
         if ($request->price == 'high') {
-            $query->where('gia','>',100);
+            $query->where('gia','>',100000);
         }
 
         if ($request->sort == 'bestseller') {
@@ -37,11 +37,11 @@ class BookController extends Controller
 
     public function show($id)
     {
-        $book = Sach::findOrFail($id);
+        $book = Sach::with('tacGias')->findOrFail($id);
 
         // Tìm các sách random
         // Cho ví dụ, ở đây ta lấy ngẫu nhiên 3 cuốn sách khác
-        $relatedBooks = Sach::where('id', '!=', $id)->inRandomOrder()->take(3)->get();
+        $relatedBooks = Sach::with('tacGias')->where('id', '!=', $id)->inRandomOrder()->take(3)->get();
         // Trả về view với dữ liệu sách và sách liên quan
         return view('books.show', compact('book', 'relatedBooks'));
     }
@@ -50,8 +50,10 @@ class BookController extends Controller
     {
         $query = $request->input('query');
 
-        $booksQuery = Sach::where('ten_sach', 'LIKE', "%$query%")
-            ->orWhere('tac_gia', 'LIKE', "%$query%");
+        $booksQuery = Sach::with('tacGias')->where('ten_sach', 'LIKE', "%$query%")
+            ->orWhereHas('tacGias', function($q) use ($query) {
+                $q->where('ten_tac_gia', 'LIKE', "%$query%");
+            });
 
         if ($request->ajax() || $request->has('ajax')) {
             $books = $booksQuery->take(5)->get();

@@ -123,6 +123,75 @@
             align-items: center;
             gap: 0.75rem;
         }
+
+        /* Pagination Styles */
+        .pagination-container {
+            margin-top: 2rem;
+            display: flex;
+            justify-content: center;
+        }
+
+        .pagination {
+            display: flex;
+            list-style: none;
+            padding: 0;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .pagination .page-item {
+            display: inline-block;
+        }
+
+        .pagination .page-link,
+        .pagination .page-item span {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 36px;
+            height: 36px;
+            padding: 0 0.75rem;
+            text-decoration: none;
+            color: var(--secondary);
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            font-size: 0.875rem;
+            transition: 0.2s;
+        }
+
+        .pagination .page-link:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: #f5f3ff;
+            transform: translateY(-1px);
+        }
+
+        .pagination .page-item.active .page-link,
+        .pagination .page-item.active span {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);
+        }
+
+        .pagination .page-item.disabled .page-link,
+        .pagination .page-item.disabled span {
+            color: #cbd5e1;
+            background: #f8fafc;
+            border-color: #e2e8f0;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Hide "Showing X to Y of Z results" text from Laravel default pagination */
+        .pagination-container nav > div:first-child {
+            display: none !important;
+        }
+        .pagination-container nav p {
+            display: none !important;
+        }
     </style>
 </head>
 <body>

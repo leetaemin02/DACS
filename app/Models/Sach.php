@@ -36,4 +36,10 @@ class Sach extends Model
     {
         return $this->hasMany(DanhGia::class, 'sach_id');
     }
+
+    // Thiết lập mối quan hệ: Một cuốn sách có thể có nhiều tác giả
+    public function tacGias()
+    {
+        return $this->belongsToMany(TacGia::class, 'tac_gia_sach', 'sach_id', 'tac_gia_id');
+    }
 }

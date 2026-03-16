@@ -35,10 +35,10 @@
             </div>
             <div class="book-content">
                 <h3 class="book-title">{{ $book->ten_sach }}</h3>
-                <p class="book-author">bởi {{ $book->tac_gia }}</p>
+                <p class="book-author">bởi {{ $book->tacGias->pluck('ten_tac_gia')->implode(', ') }}</p>
                 <div class="book-price">
-                    <span>{{ number_format($book->gia, 3) }}đ</span>
-                    <button class="add-to-cart-btn">Xem chi tiết</button>
+                    <span style="color: #ff0000">{{ number_format($book->gia,0) }}đ</span>
+                    <button class="add-to-cart-btn" data-id="{{ $book->id }}" style="position: relative; z-index: 2;">Thêm vào giỏ hàng</button>
                 </div>
             </div>
             <a href="{{ route('books.show', $book->id) }}" style="position:absolute; top:0; left:0; width:100%; height:100%; z-index:1;"></a>
@@ -49,4 +49,70 @@
         {{ $books->onEachSide(1)->links() }}
     </div>
 </div>
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const addToCartBtns = document.querySelectorAll('.add-to-cart-btn');
+    
+    addToCartBtns.forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            @if(!Auth::check())
+                window.location.href = "{{ route('login') }}";
+                return;
+            @endif
+
+            const bookId = this.getAttribute('data-id');
+            const originalText = this.innerHTML;
+            
+            this.disabled = true;
+            this.innerHTML = '...';
+
+            fetch('{{ route("api.cart.add") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({
+                    sach_id: bookId,
+                    so_luong: 1
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.success) {
+                    showToast(data.message);
+                    // Update cart count in header
+                    const cartLink = document.querySelector('.nav-link[href*="cart"]');
+                    if(cartLink) {
+                        cartLink.innerHTML = `
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="9" cy="21" r="1"></circle>
+                                <circle cx="20" cy="21" r="1"></circle>
+                                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                            </svg>
+                            Cart (${data.count})
+                        `;
+                    }
+                } else {
+                    showToast(data.message || 'Có lỗi xảy ra!', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('Không thể thêm vào giỏ hàng!', 'error');
+            })
+            .finally(() => {
+                this.disabled = false;
+                this.innerHTML = originalText;
+            });
+        });
+    });
+});
+</script>
+@endpush
 @endsection

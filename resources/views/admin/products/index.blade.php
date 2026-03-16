@@ -31,11 +31,11 @@
                          style="width: 40px; height: 60px; object-fit: cover; border-radius: 4px;">
                 </td>
                 <td style="font-weight: 600;">{{ $product->ten_sach }}</td>
-                <td>{{ number_format($product->gia, 3) }}đ</td>
-                <td>{{ $product->tac_gia }}</td>
+                <td>{{ number_format($product->gia, 0) }}đ</td>
+                <td>{{ $product->tacGias->pluck('ten_tac_gia')->implode(', ') }}</td>
                 <td>
                     <div style="display: flex; gap: 0.5rem;">
-                        <a href="#" style="color: #4f46e5; text-decoration: none;">Sửa</a>
+                        <a href="{{ route('admin.products.edit', ['id' => $product->id, 'page' => $products->currentPage()]) }}" style="color: #4f46e5; text-decoration: none;">Sửa</a>
                         <span style="color: #e2e8f0;">|</span>
                         <a href="#" style="color: #ef4444; text-decoration: none;">Xóa</a>
                     </div>
@@ -45,8 +45,8 @@
         </tbody>
     </table>
     
-    <div style="margin-top: 1.5rem;">
-        {{ $products->links() }}
+    <div class="pagination-container">
+        {{ $products->onEachSide(1)->links() }}
     </div>
 </div>
 @endsection
