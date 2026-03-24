@@ -47,4 +47,14 @@ class ProfileController extends Controller
 
         return redirect()->back()->with('success', 'Đổi mật khẩu thành công!');
     }
+
+    public function orders()
+    {
+        $user = auth()->user();
+        $orders = \App\Models\DonHang::where('nguoi_dung_id', $user->id)
+            ->with(['chiTietDonHangs.sach'])
+            ->latest()
+            ->paginate(10);
+        return view('profile.orders', compact('orders'));
+    }
 }

@@ -23,6 +23,11 @@ class AuthController extends Controller
 
         if (Auth::attempt(['email' => $request->email, 'password' => $request->mat_khau])) {
             $request->session()->regenerate();
+
+            if (Auth::user()->vai_tro === 'admin') {
+                return redirect()->intended('/admin/dashboard');
+            }
+
             return redirect()->intended('/');
         }
 

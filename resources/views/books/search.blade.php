@@ -25,6 +25,15 @@
                         <div class="book-content">
                             <h3 class="book-title">{{ $book->ten_sach }}</h3>
                             <p class="book-author">by {{ $book->tacGias->pluck('ten_tac_gia')->implode(', ') }}</p>
+                            
+                            <div class="rating-stars" style="margin-bottom: 0.5rem; gap: 2px;">
+                                @for($i = 1; $i <= 5; $i++)
+                                    <svg class="star-icon" viewBox="0 0 24 24" fill="{{ $i <= round($book->average_rating) ? '#fbbf24' : '#d1d5db' }}" style="width: 14px; height: 14px;">
+                                        <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+                                    </svg>
+                                @endfor
+                                <span style="font-size: 0.75rem; color: var(--text-secondary); margin-left: 4px;">({{ $book->review_count }})</span>
+                            </div>
                             <div class="book-price">
                                 <span>{{ number_format($book->gia, 0) }}đ</span>
                                 <button class="add-to-cart-btn" data-id="{{ $book->id }}" style="position: relative; z-index: 2;">Thêm vào giỏ hàng</button>

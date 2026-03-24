@@ -2,22 +2,34 @@
 
 @section('content')
 <div class="container">
-    <h1>Thư viện</h1>
+    <h1>
+        @if(request('category'))
+            Thể loại: {{ request('category') }}
+        @else
+            Thư viện sách
+        @endif
+    </h1>
     <!-- Filter by category -->
     <div class="filter-mini-wrapper">
     <form method="GET" action="{{ route('books.categories') }}" class="filter-mini">
-    <select name="price">
-        <option value="">Lọc giá</option>
-        <option value="low" {{ request('price') == 'low' ? 'selected' : '' }}>Dưới 50k</option>
-        <option value="medium" {{ request('price') == 'medium' ? 'selected' : '' }}>50k - 100k</option>
-        <option value="high" {{ request('price') == 'high' ? 'selected' : '' }}>Trên 100k</option>
-    </select>
-    <select name="sort">
-        <option value="">Sắp xếp</option>
-        <option value="bestseller" {{ request('sort') == 'bestseller' ? 'selected' : '' }}>Bán chạy</option>
-        <option value="new" {{ request('sort') == 'new' ? 'selected' : '' }}>Mới nhất</option>
-    </select>
-    <button type="submit">Lọc</button>
+        @if(request('category'))
+            <input type="hidden" name="category" value="{{ request('category') }}">
+        @endif
+        <select name="price">
+            <option value="">Lọc giá</option>
+            <option value="low" {{ request('price') == 'low' ? 'selected' : '' }}>Dưới 50k</option>
+            <option value="medium" {{ request('price') == 'medium' ? 'selected' : '' }}>50k - 100k</option>
+            <option value="high" {{ request('price') == 'high' ? 'selected' : '' }}>Trên 100k</option>
+        </select>
+        <select name="sort">
+            <option value="">Sắp xếp</option>
+            <option value="bestseller" {{ request('sort') == 'bestseller' ? 'selected' : '' }}>Bán chạy</option>
+            <option value="new" {{ request('sort') == 'new' ? 'selected' : '' }}>Mới nhất</option>
+        </select>
+        <button type="submit">Lọc</button>
+        @if(request('category') || request('price') || request('sort'))
+            <a href="{{ route('books.categories') }}" class="btn-clear" style="margin-left: 10px; color: var(--text-secondary); font-size: 0.875rem;">Xóa lọc</a>
+        @endif
     </form>
     </div>
 
@@ -36,6 +48,15 @@
             <div class="book-content">
                 <h3 class="book-title">{{ $book->ten_sach }}</h3>
                 <p class="book-author">bởi {{ $book->tacGias->pluck('ten_tac_gia')->implode(', ') }}</p>
+                
+                <div class="rating-stars" style="margin-bottom: 0.5rem; gap: 2px;">
+                    @for($i = 1; $i <= 5; $i++)
+                        <svg class="star-icon" viewBox="0 0 24 24" fill="{{ $i <= round($book->average_rating) ? '#fbbf24' : '#d1d5db' }}" style="width: 14px; height: 14px;">
+                            <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+                        </svg>
+                    @endfor
+                    <span style="font-size: 0.75rem; color: var(--text-secondary); margin-left: 4px;">({{ $book->review_count }})</span>
+                </div>
                 <div class="book-price">
                     <span style="color: #ff0000">{{ number_format($book->gia,0) }}đ</span>
                     <button class="add-to-cart-btn" data-id="{{ $book->id }}" style="position: relative; z-index: 2;">Thêm vào giỏ hàng</button>

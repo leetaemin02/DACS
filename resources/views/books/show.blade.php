@@ -54,10 +54,101 @@
         </div>
     </div>
 
+    <!-- Reviews Section -->
+    <section class="reviews-section">
+        <div class="reviews-header">
+            <h2 style="font-size: 2rem;">Đánh giá của người mua</h2>
+            <div class="reviews-stats">
+                @php
+                    $avgRating = $book->danhGias->avg('so_sao') ?: 0;
+                    $reviewCount = $book->danhGias->count();
+                @endphp
+                <div class="average-rating">
+                    <div class="rating-number">{{ number_format($avgRating, 1) }}</div>
+                    <div class="rating-stars">
+                        @for($i = 1; $i <= 5; $i++)
+                            <svg class="star-icon" viewBox="0 0 24 24" fill="{{ $i <= round($avgRating) ? '#fbbf24' : '#d1d5db' }}">
+                                <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+                            </svg>
+                        @endfor
+                    </div>
+                    <div class="rating-count">{{ $reviewCount }} đánh giá</div>
+                </div>
+            </div>
+        </div>
+
+        @auth
+            <div class="review-form-card">
+                <h3 style="margin-bottom: 1.5rem; font-size: 1.25rem;">Viết đánh giá của bạn</h3>
+                <form id="review-form">
+                    @csrf
+                    <input type="hidden" name="sach_id" value="{{ $book->id }}">
+                    
+                    <div style="margin-bottom: 1.5rem;">
+                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Số sao</label>
+                        <div class="star-rating-input">
+                            <input type="radio" id="star5" name="so_sao" value="5" required/><label for="star5" title="5 stars">★</label>
+                            <input type="radio" id="star4" name="so_sao" value="4"/><label for="star4" title="4 stars">★</label>
+                            <input type="radio" id="star3" name="so_sao" value="3"/><label for="star3" title="3 stars">★</label>
+                            <input type="radio" id="star2" name="so_sao" value="2"/><label for="star2" title="2 stars">★</label>
+                            <input type="radio" id="star1" name="so_sao" value="1"/><label for="star1" title="1 star">★</label>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 1.5rem;">
+                        <label for="binh_luan" style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Bình luận</label>
+                        <textarea name="binh_luan" id="binh_luan" rows="4" style="width: 100%; padding: 1rem; border: 1px solid var(--border-color); border-radius: var(--radius); font-size: 1rem; resize: vertical;" placeholder="Chia sẻ cảm nhận của bạn về cuốn sách này..."></textarea>
+                    </div>
+
+                    <button type="submit" class="nav-btn" style="min-width: 160px;">Gửi đánh giá</button>
+                </form>
+            </div>
+        @else
+            <div style="background: #f8fafc; padding: 2rem; border-radius: var(--radius); text-align: center; margin-bottom: 3rem; border: 2px dashed var(--border-color);">
+                <p style="color: var(--text-secondary); margin-bottom: 1rem;">Bạn cần đăng nhập để gửi đánh giá.</p>
+                <a href="{{ route('login') }}" class="nav-link" style="color: var(--primary-color); font-weight: 700;">Đăng nhập ngay &rarr;</a>
+            </div>
+        @endauth
+
+        <div class="reviews-list">
+            @forelse($book->danhGias->sortByDesc('created_at') as $review)
+                <div class="review-item">
+                    <div class="review-user-info">
+                        <div class="user-avatar">
+                            {{ strtoupper(substr($review->nguoiDung->ho_ten ?? 'U', 0, 1)) }}
+                        </div>
+                        <div class="review-meta">
+                            <h4>{{ $review->nguoiDung->ho_ten ?? 'Người dùng' }}</h4>
+                            <div class="review-date">{{ $review->created_at->format('d/m/Y') }}</div>
+                        </div>
+                        <div style="margin-left: auto;">
+                            <div class="rating-stars" style="margin-top: 0;">
+                                @for($i = 1; $i <= 5; $i++)
+                                    <svg class="star-icon" viewBox="0 0 24 24" fill="{{ $i <= $review->so_sao ? '#fbbf24' : '#d1d5db' }}">
+                                        <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+                                    </svg>
+                                @endfor
+                            </div>
+                        </div>
+                    </div>
+                    @if($review->binh_luan)
+                        <div class="review-comment-text">
+                            {{ $review->binh_luan }}
+                        </div>
+                    @endif
+                </div>
+            @empty
+                <div style="text-align: center; padding: 3rem; color: var(--text-secondary);">
+                    Chưa có đánh giá nào cho cuốn sách này. Hãy là người đầu tiên đánh giá!
+                </div>
+            @endforelse
+        </div>
+    </section>
+
     <!-- Related Books -->
     @if($relatedBooks->count() > 0)
-    <section>
-        <h2 class="mb-4">Bạn cũng có thể thích</h2>
+    <section style="margin-top: 4rem;">
+        <h2 class="mb-4" style="font-size: 2rem;">Bạn cũng có thể thích</h2>
         <div class="book-grid">
             @foreach($relatedBooks as $related)
             <div class="book-card">
@@ -74,6 +165,15 @@
                     <div class="book-category">Gợi ý cho bạn</div>
                     <h3 class="book-title">{{ $related->ten_sach }}</h3>
                     <p class="book-author">{{ $related->tacGias->pluck('ten_tac_gia')->implode(', ') }}</p>
+                    
+                    <div class="rating-stars" style="margin-bottom: 0.5rem; gap: 2px;">
+                        @for($i = 1; $i <= 5; $i++)
+                            <svg class="star-icon" viewBox="0 0 24 24" fill="{{ $i <= round($related->average_rating) ? '#fbbf24' : '#d1d5db' }}" style="width: 14px; height: 14px;">
+                                <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+                            </svg>
+                        @endfor
+                        <span style="font-size: 0.75rem; color: var(--text-secondary); margin-left: 4px;">({{ $related->review_count }})</span>
+                    </div>
 
                     <div class="book-price">
                         <span style="color: #ff0000">{{ number_format($related->gia,0) }}đ</span>
@@ -173,6 +273,55 @@ document.addEventListener('DOMContentLoaded', function() {
         .finally(() => {
             btn.disabled = false;
             btn.innerHTML = originalText;
+        });
+    }
+
+    // Handle review form
+    const reviewForm = document.getElementById('review-form');
+    if (reviewForm) {
+        reviewForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const btn = this.querySelector('button');
+            const originalText = btn.innerHTML;
+            
+            const formData = new FormData(this);
+            const data = {
+                sach_id: formData.get('sach_id'),
+                so_sao: formData.get('so_sao'),
+                binh_luan: formData.get('binh_luan')
+            };
+
+            btn.disabled = true;
+            btn.innerHTML = 'Đang gửi...';
+
+            fetch('{{ route("api.reviews.store") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(res => {
+                if(res.success) {
+                    showToast(res.message);
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1000);
+                } else {
+                    showToast(res.message || 'Có lỗi xảy ra!', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('Có lỗi xảy ra, vui lòng thử lại!', 'error');
+            })
+            .finally(() => {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            });
         });
     }
 });

@@ -3,7 +3,7 @@
 @section('content')
 <div class="container" style="padding-top: 5rem; padding-bottom: 5rem;">
     <div style="max-width: 800px; margin: 0 auto; background: white; border-radius: 1.5rem; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1); overflow: hidden;">
-        
+
         <!-- Header Success -->
         <div style="background: #4f46e5; padding: 3rem 2rem; text-align: center; color: white;">
             <h1 style="font-size: 2.25rem; font-weight: 800; margin-bottom: 0.5rem;">Thanh toán thành công!</h1>
@@ -32,24 +32,24 @@
                 <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 1.5rem; border-bottom: 2px solid #f1f5f9; padding-bottom: 0.75rem;">Sản phẩm đã mua</h3>
                 <div style="display: flex; flex-direction: column; gap: 1.25rem;">
                     @foreach($donHang->chiTietDonHangs as $chiTiet)
-                        <div style="display: flex; align-items: center; gap: 1.25rem; padding-bottom: 1.25rem; border-bottom: 1px solid #f1f5f9;">
-                            <div style="width: 70px; height: 90px; background: #f8fafc; border-radius: 0.5rem; overflow: hidden; flex-shrink: 0; border: 1px solid #e2e8f0;">
-                                @if($chiTiet->sach->hinh_anh)
-                                    <img src="{{ Str::startsWith($chiTiet->sach->hinh_anh, ['http://', 'https://']) ? $chiTiet->sach->hinh_anh : asset('storage/' . $chiTiet->sach->hinh_anh) }}" 
-                                         alt="{{ $chiTiet->sach->ten_sach }}" 
-                                         style="width: 100%; height: 100%; object-fit: cover;">
-                                @else
-                                    <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #94a3b8; font-size: 0.7rem;">No Image</div>
-                                @endif
-                            </div>
-                            <div style="flex-grow: 1;">
-                                <h4 style="font-weight: 600; font-size: 1rem; margin-bottom: 0.25rem; color: #1e293b;">{{ $chiTiet->sach->ten_sach }}</h4>
-                                <p style="font-size: 0.875rem; color: #64748b; margin-bottom: 0;">Số lượng: {{ $chiTiet->so_luong }}</p>
-                            </div>
-                            <div style="text-align: right;">
-                                <span style="font-weight: 700; color: #0f172a;">{{ number_format($chiTiet->don_gia * $chiTiet->so_luong, 3) }}đ</span>
-                            </div>
+                    <div style="display: flex; align-items: center; gap: 1.25rem; padding-bottom: 1.25rem; border-bottom: 1px solid #f1f5f9;">
+                        <div style="width: 70px; height: 90px; background: #f8fafc; border-radius: 0.5rem; overflow: hidden; flex-shrink: 0; border: 1px solid #e2e8f0;">
+                            @if($chiTiet->sach->hinh_anh)
+                            <img src="{{ Str::startsWith($chiTiet->sach->hinh_anh, ['http://', 'https://']) ? $chiTiet->sach->hinh_anh : asset('storage/' . $chiTiet->sach->hinh_anh) }}"
+                                alt="{{ $chiTiet->sach->ten_sach }}"
+                                style="width: 100%; height: 100%; object-fit: cover;">
+                            @else
+                            <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #94a3b8; font-size: 0.7rem;">No Image</div>
+                            @endif
                         </div>
+                        <div style="flex-grow: 1;">
+                            <h4 style="font-weight: 600; font-size: 1rem; margin-bottom: 0.25rem; color: #1e293b;">{{ $chiTiet->sach->ten_sach }}</h4>
+                            <p style="font-size: 0.875rem; color: #64748b; margin-bottom: 0;">Số lượng: {{ $chiTiet->so_luong }}</p>
+                        </div>
+                        <div style="text-align: right;">
+                            <span style="font-weight: 700; color: #0f172a;">{{ number_format($chiTiet->don_gia * $chiTiet->so_luong, 0) }}đ</span>
+                        </div>
+                    </div>
                     @endforeach
                 </div>
             </div>
@@ -66,7 +66,7 @@
                 </div>
                 <div style="display: flex; justify-content: space-between; margin-top: 1rem; padding-top: 1rem; border-top: 1px dashed #cbd5e1;">
                     <span style="font-size: 1.125rem; font-weight: 700; color: #1e293b;">Tổng số tiền:</span>
-                    <span style="font-size: 1.25rem; font-weight: 800; color: #4f46e5;">{{ number_format($donHang->tong_tien, 3) }}đ</span>
+                    <span style="font-size: 1.25rem; font-weight: 800; color: #4f46e5;">{{ number_format($donHang->tong_tien, 0) }}đ</span>
                 </div>
             </div>
 

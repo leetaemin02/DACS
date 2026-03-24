@@ -58,7 +58,7 @@
                         
                         <div class="user-dropdown-menu">
                             <a href="{{ route('profile.index') }}" class="user-dropdown-item">Thông tin tài khoản</a>
-                            <a href="#" class="user-dropdown-item">Đơn hàng của tôi</a>
+                            <a href="{{ route('profile.orders') }}" class="user-dropdown-item">Đơn hàng của tôi</a>
                             
                             <form action="{{ route('logout') }}" method="POST" style="margin: 0;">
                                 @csrf

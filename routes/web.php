@@ -9,6 +9,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\VnPayController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ReviewController;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/books/{id}', [BookController::class, 'show'])->name('books.show');
@@ -34,12 +35,14 @@ Route::middleware('auth')->group(function () {
     Route::prefix('api')->group(function () {
         Route::post('/cart/add', [CartController::class, 'apiAdd'])->name('api.cart.add');
         Route::delete('/cart/remove/{id}', [CartController::class, 'apiRemove'])->name('api.cart.remove');
+        Route::post('/reviews', [ReviewController::class, 'store'])->name('api.reviews.store');
     });
 
     // Profile Routes
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
     Route::post('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
     Route::post('/profile/change-password', [ProfileController::class, 'changePassword'])->name('profile.change-password');
+    Route::get('/orders', [ProfileController::class, 'orders'])->name('profile.orders');
 });
 
 // Login & Register Routes
@@ -57,19 +60,19 @@ Route::post('/dang-xuat', [AuthController::class, 'logout'])
     ->middleware('auth');
 
 // Admin Routes
-Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
-    
+
     // Quản lý người dùng
     Route::get('/users', [AdminController::class, 'users'])->name('users');
-    
+
     // Quản lý sản phẩm
     Route::get('/products', [AdminController::class, 'products'])->name('products');
     Route::get('/products/create', [AdminController::class, 'createProduct'])->name('products.create');
     Route::post('/products/store', [AdminController::class, 'storeProduct'])->name('products.store');
     Route::get('/products/edit/{id}', [AdminController::class, 'editProduct'])->name('products.edit');
     Route::post('/products/update/{id}', [AdminController::class, 'updateProduct'])->name('products.update');
-    
+
     // Quản lý đơn hàng
     Route::get('/orders', [AdminController::class, 'orders'])->name('orders');
     Route::post('/orders/update/{id}', [AdminController::class, 'updateOrderStatus'])->name('orders.update');

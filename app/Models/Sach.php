@@ -42,4 +42,14 @@ class Sach extends Model
     {
         return $this->belongsToMany(TacGia::class, 'tac_gia_sach', 'sach_id', 'tac_gia_id');
     }
+
+    public function getAverageRatingAttribute()
+    {
+        return $this->danh_gias_avg_so_sao ?? ($this->danhGias()->avg('so_sao') ?: 0);
+    }
+
+    public function getReviewCountAttribute()
+    {
+        return $this->danh_gias_count ?? $this->danhGias()->count();
+    }
 }

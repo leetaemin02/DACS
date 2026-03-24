@@ -5,8 +5,48 @@
     <section class="hero animate-fade-in">
         <h1>Khám phá cuốn sách yêu thích của bạn</h1>
         <p>Khám phá hàng ngàn đầu sách thuộc nhiều thể loại từ tiểu thuyết đến công nghệ. Hãy sẵn sàng cho một hành trình mới với mỗi trang sách.</p>
-        <a href="#books" class="nav-btn">Xem bộ sưu tập</a>
+        <a href="/categories" class="nav-btn">Xem bộ sưu tập</a>
     </section>
+
+    <style>
+        .category-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .category-pill {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1.5rem;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 50px;
+            font-weight: 600;
+            color: var(--text-primary);
+            transition: var(--transition);
+            box-shadow: var(--shadow-sm);
+        }
+        .category-pill:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        .category-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-color);
+        }
+        .categories-section h2 {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
+        }
+    </style>
 
     <section id="books" class="mb-8">
         <h2 class="mb-4">Đang Thịnh Hành</h2>
@@ -27,6 +67,15 @@
                     <div class="book-category">{{ $book->the_loai }}</div>
                     <h3 class="book-title">{{ $book->ten_sach }}</h3>
                     <p class="book-author">{{ $book->tacGias->pluck('ten_tac_gia')->implode(', ') }}</p>
+                    
+                    <div class="rating-stars" style="margin-bottom: 0.1rem; gap: 2px;">
+                        @for($i = 1; $i <= 5; $i++)
+                            <svg class="star-icon" viewBox="0 0 24 24" fill="{{ $i <= round($book->average_rating) ? '#fbbf24' : '#d1d5db' }}" style="width: 14px; height: 14px;">
+                                <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+                            </svg>
+                        @endfor
+                        <span style="font-size: 0.75rem; color: var(--text-secondary); margin-left: 4px;">({{ $book->review_count }})</span>
+                    </div>
 
                     <div class="book-price">
                         <span style="color: #ff0000">{{ number_format($book->gia, 0) }}đ</span>

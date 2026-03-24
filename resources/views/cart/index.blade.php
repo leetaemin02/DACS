@@ -81,7 +81,7 @@
                     </div>
                     <div style="display: flex; justify-content: space-between; margin-bottom: 2rem;">
                         <span style="font-weight: 700; font-size: 1.25rem;">Tổng cộng</span>
-                        <span style="font-weight: 700; font-size: 1.25rem; color: var(--primary-color);" id="cart-total">{{ number_format($total, 3) }}đ</span>
+                        <span style="font-weight: 700; font-size: 1.25rem; color: var(--primary-color);" id="cart-total">{{ number_format($total, 0) }}đ</span>
                     </div>
                     <form action="{{ route('vnpay.payment') }}" method="POST">
                         @csrf
