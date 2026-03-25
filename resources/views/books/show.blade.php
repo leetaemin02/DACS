@@ -136,6 +136,13 @@
                             {{ $review->binh_luan }}
                         </div>
                     @endif
+                    
+                    @if($review->phan_hoi_admin)
+                        <div class="admin-reply" style="margin-top: 1rem; padding: 1rem; background-color: #f8fafc; border-left: 4px solid var(--primary-color); border-radius: 0.5rem;">
+                            <h5 style="margin-bottom: 0.5rem; color: var(--text-color); font-size: 0.9rem; font-weight: 600;">Phản hồi từ người bán:</h5>
+                            <p style="margin: 0; color: var(--text-secondary); font-size: 0.9rem; line-height: 1.5;">{{ $review->phan_hoi_admin }}</p>
+                        </div>
+                    @endif
                 </div>
             @empty
                 <div style="text-align: center; padding: 3rem; color: var(--text-secondary);">

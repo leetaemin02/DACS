@@ -57,6 +57,13 @@
                         </div>
                         
                         <div class="user-dropdown-menu">
+                            @if(Auth::user()->vai_tro === 'admin')
+                                <a href="{{ route('admin.dashboard') }}" class="user-dropdown-item" style="font-weight: 600; color: #4f46e5;">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.25rem; vertical-align: text-bottom;"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                                    Vào Trang Admin
+                                </a>
+                                <div style="border-top: 1px solid #e2e8f0; margin: 0.5rem 0;"></div>
+                            @endif
                             <a href="{{ route('profile.index') }}" class="user-dropdown-item">Thông tin tài khoản</a>
                             <a href="{{ route('profile.orders') }}" class="user-dropdown-item">Đơn hàng của tôi</a>
                             

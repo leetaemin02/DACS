@@ -65,6 +65,9 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
     // Quản lý người dùng
     Route::get('/users', [AdminController::class, 'users'])->name('users');
+    Route::get('/users/edit/{id}', [AdminController::class, 'editUser'])->name('users.edit');
+    Route::post('/users/update/{id}', [AdminController::class, 'updateUser'])->name('users.update');
+    Route::delete('/users/destroy/{id}', [AdminController::class, 'destroyUser'])->name('users.destroy');
 
     // Quản lý sản phẩm
     Route::get('/products', [AdminController::class, 'products'])->name('products');
@@ -76,4 +79,10 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // Quản lý đơn hàng
     Route::get('/orders', [AdminController::class, 'orders'])->name('orders');
     Route::post('/orders/update/{id}', [AdminController::class, 'updateOrderStatus'])->name('orders.update');
+
+    // Quản lý đánh giá
+    Route::get('/reviews', [AdminController::class, 'reviews'])->name('reviews');
+    Route::post('/reviews/reply/{id}', [AdminController::class, 'replyReview'])->name('reviews.reply');
+    Route::delete('/reviews/reply/{id}', [AdminController::class, 'deleteReplyReview'])->name('reviews.reply.delete');
+    Route::delete('/reviews/destroy/{id}', [AdminController::class, 'destroyReview'])->name('reviews.destroy');
 });

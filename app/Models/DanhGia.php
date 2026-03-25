@@ -16,6 +16,7 @@ class DanhGia extends Model
         'sach_id',
         'so_sao',
         'binh_luan',
+        'phan_hoi_admin',
     ];
 
     public function nguoiDung()
