@@ -6,12 +6,6 @@
     <a href="{{ route('admin.products.create') }}" style="background: var(--primary); color: white; padding: 0.75rem 1.5rem; border-radius: 0.5rem; text-decoration: none; font-weight: 600;">+ Thêm sản phẩm</a>
 </div>
 
-@if(session('success'))
-    <div style="background: #dcfce7; color: #166534; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1.5rem;">
-        {{ session('success') }}
-    </div>
-@endif
-
 <div class="table-card">
     <table>
         <thead>

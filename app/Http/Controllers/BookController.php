@@ -13,32 +13,34 @@ class BookController extends Controller
             ->withAvg('danhGias', 'so_sao')
             ->withCount('danhGias');
 
-        if ($request->has('category') && $request->category != '') {
+        // Filter by multiple categories
+        $selectedCategories = $request->input('categories', []);
+        if (!empty($selectedCategories)) {
+            $query->whereIn('the_loai', $selectedCategories);
+        } elseif ($request->has('category') && $request->category != '') {
+            // Support existing single category link
             $query->where('the_loai', $request->category);
+            $selectedCategories = [$request->category];
         }
 
         if ($request->price == 'low') {
             $query->where('gia','<',50000);
-        }
-
-        if ($request->price == 'medium') {
+        } elseif ($request->price == 'medium') {
             $query->whereBetween('gia',[50000,100000]);
-        }
-
-        if ($request->price == 'high') {
+        } elseif ($request->price == 'high') {
             $query->where('gia','>',100000);
         }
 
         if ($request->sort == 'bestseller') {
             $query->orderBy('so_luong','desc');
-        }
-
-        if ($request->sort == 'new') {
+        } elseif ($request->sort == 'new') {
             $query->orderBy('created_at','desc');
         }
 
+        $allCategories = Sach::whereNotNull('the_loai')->distinct()->pluck('the_loai');
         $books = $query->paginate(9)->withQueryString();
-        return view('books.categories', compact('books'));
+        
+        return view('books.categories', compact('books', 'allCategories', 'selectedCategories'));
     }
 
     public function show($id)

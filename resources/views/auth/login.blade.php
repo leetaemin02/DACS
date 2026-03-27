@@ -26,7 +26,10 @@
             </div>
             
             <div class="form-group">
-                <label for="mat_khau">Mật khẩu</label>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <label for="mat_khau">Mật khẩu</label>
+                    <a href="{{ route('password.request') }}" class="auth-link" style="font-size: 0.85rem;">Quên mật khẩu?</a>
+                </div>
                 <input type="password" id="mat_khau" name="mat_khau" class="form-control" placeholder="••••••••" required>
             </div>
             

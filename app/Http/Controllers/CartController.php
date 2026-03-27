@@ -5,10 +5,21 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\GioHang;
 use App\Models\Sach;
+use App\Models\DonHang;
+use App\Models\ChiTietDonHang;
 use Illuminate\Support\Facades\Auth;
 
 class CartController extends Controller
 {
+    private function getCartData()
+    {
+        $cartItems = GioHang::with('sach')->where('nguoi_dung_id', Auth::id())->get();
+        $total = $cartItems->sum(function ($item) {
+            return $item->sach->gia * $item->so_luong;
+        });
+        return compact('cartItems', 'total');
+    }
+
     public function index()
     {
         $cartItems = GioHang::with('sach.tacGias')->where('nguoi_dung_id', Auth::id())->get();
@@ -113,5 +124,60 @@ class CartController extends Controller
             'success' => true,
             'message' => 'Đã xóa khỏi giỏ hàng!'
         ]);
+    }
+    public function checkout()
+    {
+        $data = $this->getCartData();
+
+        if ($data['cartItems']->isEmpty()) {
+            return redirect()->route('cart.index')->with('error', 'Giỏ hàng của bạn đang trống.');
+        }
+
+        return view('cart.checkout', $data);
+    }
+
+    public function processCheckout(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'phone' => 'required|string|max:20',
+            'address' => 'required|string|max:500',
+            'payment' => 'required|in:cod,vnpay'
+        ]);
+
+        $data = $this->getCartData();
+        
+        if ($data['cartItems']->isEmpty()) {
+            return redirect()->route('cart.index')->with('error', 'Giỏ hàng của bạn đang trống.');
+        }
+
+        $dia_chi_day_du = "Tên: " . $request->name . ", SĐT: " . $request->phone . ", Địa chỉ: " . $request->address;
+
+        $donHang = DonHang::create([
+            'nguoi_dung_id' => Auth::id(),
+            'tong_tien' => $data['total'],
+            'dia_chi_giao_hang' => $dia_chi_day_du,
+            'trang_thai' => 'Chờ xử lý'
+        ]);
+
+        foreach ($data['cartItems'] as $item) {
+            ChiTietDonHang::create([
+                'don_hang_id' => $donHang->id,
+                'sach_id' => $item->sach_id,
+                'so_luong' => $item->so_luong,
+                'don_gia' => $item->sach->gia
+            ]);
+        }
+
+        if ($request->payment == 'vnpay') {
+            // Lưu thông tin đơn hàng tạm vào session để VnPayController có thể lấy thông tin
+            session(['vnpay_don_hang_id' => $donHang->id]);
+            return redirect()->route('vnpay.payment');
+        }
+
+        // Nếu là COD thì xóa giỏ hàng
+        GioHang::where('nguoi_dung_id', Auth::id())->delete();
+
+        return redirect('/')->with('success', 'Đặt hàng thành công');
     }
 }

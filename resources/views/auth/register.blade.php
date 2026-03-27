@@ -26,6 +26,16 @@
             </div>
 
             <div class="form-group">
+                <label for="so_dien_thoai">Số điện thoại</label>
+                <input type="text" id="so_dien_thoai" name="so_dien_thoai" class="form-control" value="{{ old('so_dien_thoai') }}" placeholder="0123456789" required>
+            </div>
+
+            <div class="form-group">
+                <label for="dia_chi">Địa chỉ</label>
+                <input type="text" id="dia_chi" name="dia_chi" class="form-control" value="{{ old('dia_chi') }}" placeholder="Số nhà, đường, phường, xã, quận, thành phố" required>
+            </div>
+
+            <div class="form-group">
                 <label for="email">Địa chỉ Email</label>
                 <input type="email" id="email" name="email" class="form-control" value="{{ old('email') }}" placeholder="name@example.com" required>
             </div>

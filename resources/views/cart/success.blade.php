@@ -75,7 +75,7 @@
                 <a href="{{ route('home') }}" style="display: block; text-align: center; padding: 1rem; background: #f1f5f9; color: #475569; border-radius: 0.75rem; text-decoration: none; font-weight: 600; transition: background 0.2s;">
                     Quay lại trang chủ
                 </a>
-                <a href="#" style="display: block; text-align: center; padding: 1rem; background: #4f46e5; color: white; border-radius: 0.75rem; text-decoration: none; font-weight: 600; box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.2); transition: transform 0.2s;">
+                <a href="/orders" style="display: block; text-align: center; padding: 1rem; background: #4f46e5; color: white; border-radius: 0.75rem; text-decoration: none; font-weight: 600; box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.2); transition: transform 0.2s;">
                     Kiểm tra đơn hàng
                 </a>
             </div>

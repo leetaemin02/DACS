@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\Sach;
 use App\Models\DonHang;
 use App\Models\TacGia;
+use App\Models\DanhGia;
 use Illuminate\Support\Facades\DB;
 
 class AdminController extends Controller
@@ -32,6 +33,38 @@ class AdminController extends Controller
     {
         $users = User::latest()->paginate(10);
         return view('admin.users.index', compact('users'));
+    }
+
+    public function editUser($id)
+    {
+        $user = User::findOrFail($id);
+        return view('admin.users.edit', compact('user'));
+    }
+
+    public function updateUser(Request $request, $id)
+    {
+        $request->validate([
+            'vai_tro' => 'required|string|max:50'
+        ]);
+
+        $user = User::findOrFail($id);
+        $user->update([
+            'vai_tro' => $request->vai_tro
+        ]);
+
+        return redirect()->route('admin.users')->with('success', 'Cập nhật vai trò thành công!');
+    }
+
+    public function destroyUser($id)
+    {
+        $user = User::findOrFail($id);
+        // Ngăn không cho admin tự xoá chính mình (nếu cần)
+        if (auth()->id() == $id) {
+            return redirect()->route('admin.users')->with('error', 'Không thể tự xóa tài khoản của chính mình!');
+        }
+        $user->delete();
+
+        return redirect()->route('admin.users')->with('success', 'Đã xóa người dùng thành công!');
     }
 
     // --- Quản lý sản phẩm ---
@@ -61,8 +94,7 @@ class AdminController extends Controller
         if ($request->has('authors')) {
             $product->tacGias()->sync($request->authors);
         }
-
-        return redirect()->route('admin.products')->with('success', 'Thêm sản phẩm thành công');
+return redirect()->route('admin.products')->with('success', 'Thêm sản phẩm thành công');
     }
 
     public function editProduct(Request $request, $id)
@@ -98,14 +130,58 @@ class AdminController extends Controller
     // --- Quản lý đơn hàng ---
     public function orders()
     {
-        $orders = DonHang::with(['nguoiDung', 'thanhToan'])->latest()->paginate(10);
+        $orders = DonHang::with(['nguoiDung', 'thanhToan', 'chiTietDonHangs.sach'])->latest()->paginate(10);
         return view('admin.orders.index', compact('orders'));
     }
 
     public function updateOrderStatus(Request $request, $id)
     {
         $order = DonHang::findOrFail($id);
+        
+        // Không cho phép đổi trạng thái nếu đã hủy hoặc đã giao hàng
+        if (in_array($order->trang_thai, ['Đã giao hàng', 'Đã hủy'])) {
+            return back()->with('error', 'Không thể thay đổi trạng thái của đơn hàng đã hoàn tất hoặc đã hủy.');
+        }
+
         $order->update(['trang_thai' => $request->trang_thai]);
         return back()->with('success', 'Cập nhật trạng thái đơn hàng thành công');
+    }
+
+    // --- Quản lý đánh giá ---
+    public function reviews()
+    {
+        $reviews = DanhGia::with(['nguoiDung', 'sach'])->latest()->paginate(10);
+        return view('admin.reviews.index', compact('reviews'));
+    }
+
+    public function replyReview(Request $request, $id)
+    {
+        $request->validate([
+            'phan_hoi_admin' => 'required|string'
+        ]);
+
+        $review = DanhGia::findOrFail($id);
+        $review->update([
+            'phan_hoi_admin' => $request->phan_hoi_admin
+        ]);
+
+        return back()->with('success', 'Đã lưu phản hồi thành công!');
+    }
+
+    public function deleteReplyReview($id)
+    {
+        $review = DanhGia::findOrFail($id);
+        $review->update([
+            'phan_hoi_admin' => null
+        ]);
+
+        return back()->with('success', 'Đã xóa phản hồi thành công!');
+    }
+
+    public function destroyReview($id)
+    {
+        $review = DanhGia::findOrFail($id);
+        $review->delete();
+        return back()->with('success', 'Đã xóa đánh giá thành công!');
     }
 }

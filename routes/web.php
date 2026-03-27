@@ -10,6 +10,7 @@ use App\Http\Controllers\VnPayController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\PasswordResetController;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/books/{id}', [BookController::class, 'show'])->name('books.show');
@@ -27,9 +28,13 @@ Route::middleware('auth')->group(function () {
     Route::delete('/cart/remove/{id}', [CartController::class, 'remove'])->name('cart.remove');
 
     // VNPAY Routes
-    Route::post('/vnpay/payment', [VnPayController::class, 'vnpay_payment'])->name('vnpay.payment');
+    Route::match(['get', 'post'], '/vnpay/payment', [VnPayController::class, 'vnpay_payment'])->name('vnpay.payment');
     Route::get('/vnpay/return', [VnPayController::class, 'vnpay_return'])->name('vnpay.return');
     Route::get('/vnpay/success/{id}', [VnPayController::class, 'vnpay_success'])->name('vnpay.success');
+
+    // Checkout Routes
+    Route::get('/checkout', [CartController::class, 'checkout'])->name('checkout');
+    Route::post('/checkout', [CartController::class, 'processCheckout'])->name('checkout.process');
 
     // API Routes for AJAX inside auth group
     Route::prefix('api')->group(function () {
@@ -52,6 +57,12 @@ Route::middleware('guest')->group(function () {
 
     Route::get('/dang-ky', [AuthController::class, 'showRegisterForm'])->name('register');
     Route::post('/dang-ky', [AuthController::class, 'register']);
+
+    // Forgot Password Routes
+    Route::get('/quen-mat-khau', [PasswordResetController::class, 'showLinkRequestForm'])->name('password.request');
+    Route::post('/quen-mat-khau', [PasswordResetController::class, 'sendResetLinkEmail'])->name('password.email');
+    Route::get('/dat-lai-mat-khau/{token}', [PasswordResetController::class, 'showResetForm'])->name('password.reset');
+    Route::post('/dat-lai-mat-khau', [PasswordResetController::class, 'reset'])->name('password.update');
 });
 
 // Logout Route
@@ -63,8 +74,11 @@ Route::post('/dang-xuat', [AuthController::class, 'logout'])
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
 
-    // Quản lý người dùng
+// Quản lý người dùng
     Route::get('/users', [AdminController::class, 'users'])->name('users');
+    Route::get('/users/edit/{id}', [AdminController::class, 'editUser'])->name('users.edit');
+    Route::post('/users/update/{id}', [AdminController::class, 'updateUser'])->name('users.update');
+    Route::delete('/users/destroy/{id}', [AdminController::class, 'destroyUser'])->name('users.destroy');
 
     // Quản lý sản phẩm
     Route::get('/products', [AdminController::class, 'products'])->name('products');
@@ -76,4 +90,10 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // Quản lý đơn hàng
     Route::get('/orders', [AdminController::class, 'orders'])->name('orders');
     Route::post('/orders/update/{id}', [AdminController::class, 'updateOrderStatus'])->name('orders.update');
+
+    // Quản lý đánh giá
+    Route::get('/reviews', [AdminController::class, 'reviews'])->name('reviews');
+    Route::post('/reviews/reply/{id}', [AdminController::class, 'replyReview'])->name('reviews.reply');
+    Route::delete('/reviews/reply/{id}', [AdminController::class, 'deleteReplyReview'])->name('reviews.reply.delete');
+    Route::delete('/reviews/destroy/{id}', [AdminController::class, 'destroyReview'])->name('reviews.destroy');
 });

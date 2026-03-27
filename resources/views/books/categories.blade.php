@@ -2,72 +2,94 @@
 
 @section('content')
 <div class="container">
-    <h1>
+    <h1 class="mb-4">
         @if(request('category'))
             Thể loại: {{ request('category') }}
         @else
             Thư viện sách
         @endif
     </h1>
-    <!-- Filter by category -->
-    <div class="filter-mini-wrapper">
-    <form method="GET" action="{{ route('books.categories') }}" class="filter-mini">
-        @if(request('category'))
-            <input type="hidden" name="category" value="{{ request('category') }}">
-        @endif
-        <select name="price">
-            <option value="">Lọc giá</option>
-            <option value="low" {{ request('price') == 'low' ? 'selected' : '' }}>Dưới 50k</option>
-            <option value="medium" {{ request('price') == 'medium' ? 'selected' : '' }}>50k - 100k</option>
-            <option value="high" {{ request('price') == 'high' ? 'selected' : '' }}>Trên 100k</option>
-        </select>
-        <select name="sort">
-            <option value="">Sắp xếp</option>
-            <option value="bestseller" {{ request('sort') == 'bestseller' ? 'selected' : '' }}>Bán chạy</option>
-            <option value="new" {{ request('sort') == 'new' ? 'selected' : '' }}>Mới nhất</option>
-        </select>
-        <button type="submit">Lọc</button>
-        @if(request('category') || request('price') || request('sort'))
-            <a href="{{ route('books.categories') }}" class="btn-clear" style="margin-left: 10px; color: var(--text-secondary); font-size: 0.875rem;">Xóa lọc</a>
-        @endif
-    </form>
-    </div>
-
-    <div class="book-grid">
-        @foreach($books as $book)
-        <div class="book-card">
-            <div class="book-image">
-                @if($book->hinh_anh)
-                <img src="{{ Str::startsWith($book->hinh_anh, ['http://', 'https://']) ? $book->hinh_anh : asset('storage/' . $book->hinh_anh) }}"
-                    alt="{{ $book->ten_sach }}"
-                    style="width:100%; height:100%; object-fit:cover;">
-                @else
-                <div style="display:flex; align-items:center; justify-content:center; height:100%; background:#e2e8f0; color:#64748b;">No Image</div>
-                @endif
-            </div>
-            <div class="book-content">
-                <h3 class="book-title">{{ $book->ten_sach }}</h3>
-                <p class="book-author">bởi {{ $book->tacGias->pluck('ten_tac_gia')->implode(', ') }}</p>
-                
-                <div class="rating-stars" style="margin-bottom: 0.5rem; gap: 2px;">
-                    @for($i = 1; $i <= 5; $i++)
-                        <svg class="star-icon" viewBox="0 0 24 24" fill="{{ $i <= round($book->average_rating) ? '#fbbf24' : '#d1d5db' }}" style="width: 14px; height: 14px;">
-                            <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
-                        </svg>
-                    @endfor
-                    <span style="font-size: 0.75rem; color: var(--text-secondary); margin-left: 4px;">({{ $book->review_count }})</span>
+    <div class="category-layout">
+        <div class="category-main">
+            <div class="book-grid" style="padding-top: 0;">
+                @foreach($books as $book)
+                <div class="book-card">
+                    <div class="book-image">
+                        @if($book->hinh_anh)
+                        <img src="{{ Str::startsWith($book->hinh_anh, ['http://', 'https://']) ? $book->hinh_anh : asset('storage/' . $book->hinh_anh) }}"
+                            alt="{{ $book->ten_sach }}"
+                            style="width:100%; height:100%; object-fit:cover;">
+                        @else
+                        <div style="display:flex; align-items:center; justify-content:center; height:100%; background:#e2e8f0; color:#64748b;">No Image</div>
+                        @endif
+                    </div>
+                    <div class="book-content">
+                        <h3 class="book-title">{{ $book->ten_sach }}</h3>
+                        <p class="book-author">bởi {{ $book->tacGias->pluck('ten_tac_gia')->implode(', ') }}</p>
+                        
+                        <div class="rating-stars" style="margin-bottom: 0.5rem; gap: 2px;">
+                            @for($i = 1; $i <= 5; $i++)
+                                <svg class="star-icon" viewBox="0 0 24 24" fill="{{ $i <= round($book->average_rating) ? '#fbbf24' : '#d1d5db' }}" style="width: 14px; height: 14px;">
+                                    <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+                                </svg>
+                            @endfor
+                            <span style="font-size: 0.75rem; color: var(--text-secondary); margin-left: 4px;">({{ $book->review_count }})</span>
+                        </div>
+                        <div class="book-price">
+                            <span style="color: #ff0000">{{ number_format($book->gia,0) }}đ</span>
+                            <button class="add-to-cart-btn" data-id="{{ $book->id }}" style="position: relative; z-index: 2;">Thêm vào giỏ hàng</button>
+                        </div>
+                    </div>
+                    <a href="{{ route('books.show', $book->id) }}" style="position:absolute; top:0; left:0; width:100%; height:100%; z-index:1;"></a>
                 </div>
-                <div class="book-price">
-                    <span style="color: #ff0000">{{ number_format($book->gia,0) }}đ</span>
-                    <button class="add-to-cart-btn" data-id="{{ $book->id }}" style="position: relative; z-index: 2;">Thêm vào giỏ hàng</button>
-                </div>
+                @endforeach
             </div>
-            <a href="{{ route('books.show', $book->id) }}" style="position:absolute; top:0; left:0; width:100%; height:100%; z-index:1;"></a>
+            <div class="pagination-container">
+                {{ $books->onEachSide(1)->links() }}
+            </div>
         </div>
-        @endforeach
-    </div>
-    <div class="pagination-container">
-        {{ $books->onEachSide(1)->links() }}
+
+        <!-- Filter Sidebar -->
+        <aside class="filter-sidebar">
+            <form method="GET" action="{{ route('books.categories') }}">
+                <div class="filter-section">
+                    <h4>Thể loại</h4>
+                    <div class="filter-group">
+                        @foreach($allCategories as $category)
+                            <label class="filter-checkbox">
+                                <input type="checkbox" name="categories[]" value="{{ $category }}" 
+                                    {{ in_array($category, $selectedCategories) ? 'checked' : '' }}>
+                                {{ $category }}
+                            </label>
+                        @endforeach
+                    </div>
+                </div>
+
+                <div class="filter-section">
+                    <h4>Lọc theo giá</h4>
+                    <select name="price">
+                        <option value="">Tất cả giá</option>
+                        <option value="low" {{ request('price') == 'low' ? 'selected' : '' }}>Dưới 50k</option>
+                        <option value="medium" {{ request('price') == 'medium' ? 'selected' : '' }}>50k - 100k</option>
+                        <option value="high" {{ request('price') == 'high' ? 'selected' : '' }}>Trên 100k</option>
+                    </select>
+                </div>
+
+                <div class="filter-section">
+                    <h4>Sắp xếp</h4>
+                    <select name="sort">
+                        <option value="">Mặc định</option>
+                        <option value="bestseller" {{ request('sort') == 'bestseller' ? 'selected' : '' }}>Bán chạy</option>
+                        <option value="new" {{ request('sort') == 'new' ? 'selected' : '' }}>Mới nhất</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="nav-btn">Áp dụng lọc</button>
+                @if(request('categories') || request('category') || request('price') || request('sort'))
+                    <a href="{{ route('books.categories') }}" style="display: block; text-align: center; margin-top: 1rem; font-size: 0.9rem; color: var(--text-secondary);">Xóa tất cả bộ lọc</a>
+                @endif
+            </form>
+        </aside>
     </div>
 </div>
 

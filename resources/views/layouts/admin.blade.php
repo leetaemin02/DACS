@@ -108,7 +108,7 @@
         }
 
         th { text-align: left; padding: 1rem; border-bottom: 2px solid #f1f5f9; color: var(--secondary); }
-        td { padding: 1rem; border-bottom: 1px solid #f1f5f9; }
+td { padding: 1rem; border-bottom: 1px solid #f1f5f9; }
 
         .logout-btn {
             margin-top: auto;
@@ -202,18 +202,54 @@
             <a href="{{ route('admin.users') }}" class="nav-item">Quản lý người dùng</a>
             <a href="{{ route('admin.products') }}" class="nav-item">Quản lý sản phẩm</a>
             <a href="{{ route('admin.orders') }}" class="nav-item">Quản lý đơn hàng</a>
+            <a href="{{ route('admin.reviews') }}" class="nav-item">Quản lý đánh giá</a>
+<div style="border-top: 1px solid rgba(255,255,255,0.1); margin: 0.5rem 0;"></div>
+            <a href="{{ url('/') }}" class="nav-item" style="color: #4ade80;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                Thoát ra trang chủ
+            </a>
         </div>
-        
-        <form action="{{ route('logout') }}" method="POST" style="margin-top: auto;">
-            @csrf
-            <button type="submit" class="logout-btn">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-                Đăng xuất
-            </button>
-        </form>
     </div>
 
     <div class="main-content">
+        @if(session('success'))
+            <div id="global-success-alert" style="background: #dcfce3; color: #166534; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); transition: opacity 0.5s ease;">
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <svg width="20" height="20" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                    <span style="font-weight: 500;">{{ session('success') }}</span>
+                </div>
+                <button type="button" onclick="document.getElementById('global-success-alert').style.display='none'" style="background: transparent; border: none; color: #166534; font-size: 1.5rem; cursor: pointer; line-height: 1; padding: 0;">&times;</button>
+            </div>
+            <script>
+                setTimeout(function() {
+                    var alert = document.getElementById('global-success-alert');
+                    if(alert) {
+                        alert.style.opacity = '0';
+                        setTimeout(() => alert.style.display = 'none', 500);
+                    }
+                }, 10000);
+            </script>
+        @endif
+
+        @if(session('error'))
+            <div id="global-error-alert" style="background: #fee2e2; color: #991b1b; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); transition: opacity 0.5s ease;">
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+<svg width="20" height="20" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                    <span style="font-weight: 500;">{{ session('error') }}</span>
+                </div>
+                <button type="button" onclick="document.getElementById('global-error-alert').style.display='none'" style="background: transparent; border: none; color: #991b1b; font-size: 1.5rem; cursor: pointer; line-height: 1; padding: 0;">&times;</button>
+            </div>
+            <script>
+                setTimeout(function() {
+                    var alert = document.getElementById('global-error-alert');
+                    if(alert) {
+                        alert.style.opacity = '0';
+                        setTimeout(() => alert.style.display = 'none', 500);
+                    }
+                }, 10000);
+            </script>
+        @endif
+
         @yield('admin_content')
     </div>
 </body>

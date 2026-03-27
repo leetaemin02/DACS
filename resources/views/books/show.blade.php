@@ -47,7 +47,7 @@
                     </div>
                     <div>
                         <span style="color: var(--text-secondary); display: block; font-size: 0.875rem;">Trạng thái</span>
-                        <span style="font-weight: 600;">{{ $book->so_luong > 0 ? 'Còn hàng' : 'Hết hàng' }}</span>
+<span style="font-weight: 600;">{{ $book->so_luong > 0 ? 'Còn hàng' : 'Hết hàng' }}</span>
                     </div>
                 </div>
             </div>
@@ -97,7 +97,7 @@
 
                     <div style="margin-bottom: 1.5rem;">
                         <label for="binh_luan" style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Bình luận</label>
-                        <textarea name="binh_luan" id="binh_luan" rows="4" style="width: 100%; padding: 1rem; border: 1px solid var(--border-color); border-radius: var(--radius); font-size: 1rem; resize: vertical;" placeholder="Chia sẻ cảm nhận của bạn về cuốn sách này..."></textarea>
+<textarea name="binh_luan" id="binh_luan" rows="4" style="width: 100%; padding: 1rem; border: 1px solid var(--border-color); border-radius: var(--radius); font-size: 1rem; resize: vertical;" placeholder="Chia sẻ cảm nhận của bạn về cuốn sách này..."></textarea>
                     </div>
 
                     <button type="submit" class="nav-btn" style="min-width: 160px;">Gửi đánh giá</button>
@@ -134,6 +134,13 @@
                     @if($review->binh_luan)
                         <div class="review-comment-text">
                             {{ $review->binh_luan }}
+                        </div>
+                    @endif
+                    
+                    @if($review->phan_hoi_admin)
+                        <div class="admin-reply" style="margin-top: 1rem; padding: 1rem; background-color: #f8fafc; border-left: 4px solid var(--primary-color); border-radius: 0.5rem;">
+                            <h5 style="margin-bottom: 0.5rem; color: var(--text-color); font-size: 0.9rem; font-weight: 600;">Phản hồi từ người bán:</h5>
+<p style="margin: 0; color: var(--text-secondary); font-size: 0.9rem; line-height: 1.5;">{{ $review->phan_hoi_admin }}</p>
                         </div>
                     @endif
                 </div>
@@ -185,7 +192,7 @@
             @endforeach
         </div>
     </section>
-    @endif
+@endif
 </div>
 @push('scripts')
 <script>
@@ -268,7 +275,7 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .catch(error => {
             console.error('Error:', error);
-            showToast('Có lỗi xảy ra, vui lòng thử lại!', 'error');
+showToast('Có lỗi xảy ra, vui lòng thử lại!', 'error');
         })
         .finally(() => {
             btn.disabled = false;
