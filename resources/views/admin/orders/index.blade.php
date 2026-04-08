@@ -101,6 +101,9 @@
                 </tbody>
             </table>
             <div style="text-align: right; margin-top: 1rem; border-top: 1px solid #e2e8f0; padding-top: 1rem;">
+                @if($order->maGiamGia)
+                <h4 style="margin: 0 0 0.5rem 0; font-size: 1rem; color: #64748b;">Mã giảm giá <span style="font-family:monospace">({{ $order->maGiamGia->ma_code }})</span>: <span style="color: #ef4444;">-{{ $order->maGiamGia->so_tien_giam ? number_format($order->maGiamGia->so_tien_giam,0).'đ' : $order->maGiamGia->phan_tram_giam.'%' }}</span></h4>
+                @endif
                 <h4 style="margin: 0; font-size: 1.25rem;">Tổng cộng: <span style="color: var(--primary);">{{ number_format($order->tong_tien, 0) }}đ</span></h4>
             </div>
         </div>

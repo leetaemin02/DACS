@@ -48,6 +48,7 @@
                         </label>
                     </div>
 
+                    <input type="hidden" name="ma_giam_gia_id" id="ma_giam_gia_id" value="">
                     <button class="btn-order">Xác nhận đặt hàng</button>
                 </form>
             </div>

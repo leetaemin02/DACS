@@ -201,8 +201,17 @@ td { padding: 1rem; border-bottom: 1px solid #f1f5f9; }
             <a href="{{ route('admin.dashboard') }}" class="nav-item">Dashboard</a>
             <a href="{{ route('admin.users') }}" class="nav-item">Quản lý người dùng</a>
             <a href="{{ route('admin.products') }}" class="nav-item">Quản lý sản phẩm</a>
-            <a href="{{ route('admin.orders') }}" class="nav-item">Quản lý đơn hàng</a>
+            <a href="{{ route('admin.orders') }}" class="nav-item" style="position: relative;">
+                Quản lý đơn hàng
+                @php
+                    $pendingCount = \App\Models\DonHang::whereIn('trang_thai', ['Chờ xử lý', 'Chờ duyệt'])->count();
+                @endphp
+                @if($pendingCount > 0)
+                    <span style="background: #ef4444; color: white; font-size: 0.7rem; font-weight: 700; padding: 0.15rem 0.5rem; border-radius: 50px; margin-left: auto;">{{ $pendingCount }}</span>
+                @endif
+            </a>
             <a href="{{ route('admin.reviews') }}" class="nav-item">Quản lý đánh giá</a>
+            <a href="{{ route('admin.coupons') }}" class="nav-item">Quản lý mã giảm giá</a>
 <div style="border-top: 1px solid rgba(255,255,255,0.1); margin: 0.5rem 0;"></div>
             <a href="{{ url('/') }}" class="nav-item" style="color: #4ade80;">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>

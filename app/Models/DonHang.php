@@ -11,6 +11,17 @@ class DonHang extends Model
 
     protected $table = 'don_hang'; // Kết nối với bảng 'don_hang' trong DB
 
+    // Định nghĩa các hằng số phương thức thanh toán
+    const PAYMENT_VNPAY = 'VNPAY';
+    const PAYMENT_COD = 'Thanh toán khi nhận hàng (COD)';
+
+    // Định nghĩa các hằng số trạng thái đơn hàng
+    const STATUS_PENDING = 'Chờ duyệt';
+    const STATUS_PROCESSING = 'Đang xử lý';
+    const STATUS_SHIPPING = 'Đang giao';
+    const STATUS_COMPLETED = 'Đã hoàn thành';
+    const STATUS_CANCELLED = 'Đã hủy';
+
     protected $fillable = [ // Các trường được phép ghi dữ liệu
         'nguoi_dung_id',
         'thanh_toan_id',
@@ -19,6 +30,25 @@ class DonHang extends Model
         'trang_thai',
         'dia_chi_giao_hang',
     ];
+
+    // Kiểm tra xem đơn hàng có thanh toán qua VNPAY không
+    public function isVnPay()
+    {
+        return $this->thanhToan && $this->thanhToan->phuong_thuc === self::PAYMENT_VNPAY;
+    }
+
+    // Kiểm tra xem đơn hàng có thanh toán COD không
+    public function isCod()
+    {
+        return $this->thanhToan && $this->thanhToan->phuong_thuc === self::PAYMENT_COD;
+    }
+
+    // Lấy tên phương thức thanh toán
+    public function getPaymentMethodName()
+    {
+        return $this->thanhToan ? $this->thanhToan->phuong_thuc : 'Chưa xác định';
+    }
+
     // Thiết lập mối quan hệ: Một đơn hàng thuộc về một người dùng
     public function nguoiDung()
     {

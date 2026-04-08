@@ -28,7 +28,7 @@
             <div class="form-group">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                     <label for="mat_khau">Mật khẩu</label>
-                    <a href="{{ route('password.request') }}" class="auth-link" style="font-size: 0.85rem;">Quên mật khẩu?</a>
+                    
                 </div>
                 <input type="password" id="mat_khau" name="mat_khau" class="form-control" placeholder="••••••••" required>
             </div>
@@ -38,6 +38,9 @@
 
         <div class="auth-footer">
             Chưa có tài khoản? <a href="{{ route('register') }}" class="auth-link">Đăng ký ngay</a>
+        </div>
+        <div style="text-align: center; margin-top: 1rem;">
+            <a href="{{ route('password.request') }}" class="auth-link" style="font-size: 0.85rem;">Quên mật khẩu?</a>
         </div>
     </div>
 </div>

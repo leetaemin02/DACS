@@ -2,13 +2,16 @@
 
 @section('content')
 <div class="container">
-    <h1 class="mb-4">
-        @if(request('category'))
+    <div class="category-banner mb-4">
+        <h1 style="margin-bottom: 0;">
+            @if(request('category'))
             Thể loại: {{ request('category') }}
-        @else
+            @else
             Thư viện sách
-        @endif
-    </h1>
+            @endif
+        </h1>
+        <p style="margin-top: 0.5rem; opacity: 0.9;">Tìm kiếm những cuốn sách hay nhất trong kho tàng của chúng tôi</p>
+    </div>
     <div class="category-layout">
         <div class="category-main">
             <div class="book-grid" style="padding-top: 0;">
@@ -26,14 +29,14 @@
                     <div class="book-content">
                         <h3 class="book-title">{{ $book->ten_sach }}</h3>
                         <p class="book-author">bởi {{ $book->tacGias->pluck('ten_tac_gia')->implode(', ') }}</p>
-                        
+
                         <div class="rating-stars" style="margin-bottom: 0.5rem; gap: 2px;">
                             @for($i = 1; $i <= 5; $i++)
                                 <svg class="star-icon" viewBox="0 0 24 24" fill="{{ $i <= round($book->average_rating) ? '#fbbf24' : '#d1d5db' }}" style="width: 14px; height: 14px;">
-                                    <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+                                <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
                                 </svg>
-                            @endfor
-                            <span style="font-size: 0.75rem; color: var(--text-secondary); margin-left: 4px;">({{ $book->review_count }})</span>
+                                @endfor
+                                <span style="font-size: 0.75rem; color: var(--text-secondary); margin-left: 4px;">({{ $book->review_count }})</span>
                         </div>
                         <div class="book-price">
                             <span style="color: #ff0000">{{ number_format($book->gia,0) }}đ</span>
@@ -56,11 +59,11 @@
                     <h4>Thể loại</h4>
                     <div class="filter-group">
                         @foreach($allCategories as $category)
-                            <label class="filter-checkbox">
-                                <input type="checkbox" name="categories[]" value="{{ $category }}" 
-                                    {{ in_array($category, $selectedCategories) ? 'checked' : '' }}>
-                                {{ $category }}
-                            </label>
+                        <label class="filter-checkbox">
+                            <input type="checkbox" name="categories[]" value="{{ $category }}"
+                                {{ in_array($category, $selectedCategories) ? 'checked' : '' }}>
+                            {{ $category }}
+                        </label>
                         @endforeach
                     </div>
                 </div>
@@ -86,7 +89,7 @@
 
                 <button type="submit" class="nav-btn">Áp dụng lọc</button>
                 @if(request('categories') || request('category') || request('price') || request('sort'))
-                    <a href="{{ route('books.categories') }}" style="display: block; text-align: center; margin-top: 1rem; font-size: 0.9rem; color: var(--text-secondary);">Xóa tất cả bộ lọc</a>
+                <a href="{{ route('books.categories') }}" style="display: block; text-align: center; margin-top: 1rem; font-size: 0.9rem; color: var(--text-secondary);">Xóa tất cả bộ lọc</a>
                 @endif
             </form>
         </aside>
@@ -95,44 +98,44 @@
 
 @push('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const addToCartBtns = document.querySelectorAll('.add-to-cart-btn');
-    
-    addToCartBtns.forEach(btn => {
-        btn.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            
-            @if(!Auth::check())
+    document.addEventListener('DOMContentLoaded', function() {
+        const addToCartBtns = document.querySelectorAll('.add-to-cart-btn');
+
+        addToCartBtns.forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                @if(!Auth::check())
                 window.location.href = "{{ route('login') }}";
                 return;
-            @endif
+                @endif
 
-            const bookId = this.getAttribute('data-id');
-            const originalText = this.innerHTML;
-            
-            this.disabled = true;
-            this.innerHTML = '...';
+                const bookId = this.getAttribute('data-id');
+                const originalText = this.innerHTML;
 
-            fetch('{{ route("api.cart.add") }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: JSON.stringify({
-                    sach_id: bookId,
-                    so_luong: 1
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if(data.success) {
-                    showToast(data.message);
-                    // Update cart count in header
-                    const cartLink = document.querySelector('.nav-link[href*="cart"]');
-                    if(cartLink) {
-                        cartLink.innerHTML = `
+                this.disabled = true;
+                this.innerHTML = '...';
+
+                fetch('{{ route("api.cart.add") }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: JSON.stringify({
+                            sach_id: bookId,
+                            so_luong: 1
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            showToast(data.message);
+                            // Update cart count in header
+                            const cartLink = document.querySelector('.nav-link[href*="cart"]');
+                            if (cartLink) {
+                                cartLink.innerHTML = `
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <circle cx="9" cy="21" r="1"></circle>
                                 <circle cx="20" cy="21" r="1"></circle>
@@ -140,22 +143,22 @@ document.addEventListener('DOMContentLoaded', function() {
                             </svg>
                             Cart (${data.count})
                         `;
-                    }
-                } else {
-                    showToast(data.message || 'Có lỗi xảy ra!', 'error');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showToast('Không thể thêm vào giỏ hàng!', 'error');
-            })
-            .finally(() => {
-                this.disabled = false;
-                this.innerHTML = originalText;
+                            }
+                        } else {
+                            showToast(data.message || 'Có lỗi xảy ra!', 'error');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showToast('Không thể thêm vào giỏ hàng!', 'error');
+                    })
+                    .finally(() => {
+                        this.disabled = false;
+                        this.innerHTML = originalText;
+                    });
             });
         });
     });
-});
 </script>
 @endpush
 @endsection

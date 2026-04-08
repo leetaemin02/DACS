@@ -22,25 +22,25 @@ class VnPayController extends Controller
         $vnp_TmnCode = config('vnpay.vnp_TmnCode');
         $vnp_HashSecret = config('vnpay.vnp_HashSecret');
 
-        // Tính tổng tiền từ giỏ hàng
-        $cartItems = GioHang::with('sach')->where('nguoi_dung_id', Auth::id())->get();
-        if ($cartItems->isEmpty()) {
-            return redirect()->back()->with('error', 'Giỏ hàng đang trống!');
+        $donHangId = session('vnpay_don_hang_id');
+        if (!$donHangId) {
+            return redirect()->route('cart.index')->with('error', 'Không tìm thấy đơn hàng cần thanh toán!');
         }
 
-        $totalRaw = 0;
-        foreach ($cartItems as $item) {
-            $totalRaw += $item->sach->gia * $item->so_luong;
-        }
+        $donHang = DonHang::findOrFail($donHangId);
 
-        // Tùy vào cách bạn lưu giá trong DB (vd 150000 hay 150)
-        $amountMultiplier = 100; 
+        // Sử dụng tổng tiền đã được tính (bao gồm mã giảm giá)
+        $totalRaw = $donHang->tong_tien;
+
+        $amountMultiplier = 100;
         if ($totalRaw < 1000) { 
-            // Đoán rằng số tiền đang lưu dạng số nghìn (VD: 150 thay vì 150,000)
+            // Nếu lưu ở DB dạng nghìn đồng
             $amountMultiplier = 100000; 
         }
 
-        $vnp_TxnRef = date('YmdHis') . rand(1, 10000); // Mã tham chiếu (mã đơn hàng tự tạo)
+        $vnp_TxnRef = $donHang->id . '_' . date('YmdHis'); // Gắn ID đơn hàng vào mã tham chiếu
+        session(['vnpay_txn_ref' => $donHang->id]); // Lưu lại ID vào session để return check dễ hơn
+
         $vnp_OrderInfo = 'Thanh toan don hang ' . $vnp_TxnRef;
         $vnp_OrderType = 'billpayment';
         $vnp_Amount = $totalRaw * $amountMultiplier;
@@ -87,7 +87,6 @@ class VnPayController extends Controller
             $vnp_Url .= 'vnp_SecureHash=' . $vnpSecureHash;
         }
 
-        // Redirect sang trang thanh toán VNPAY
         return redirect($vnp_Url);
     }
 
@@ -121,42 +120,38 @@ class VnPayController extends Controller
             if ($request->input('vnp_ResponseCode') == '00') {
                 DB::beginTransaction();
                 try {
+                    $donHangId = session('vnpay_txn_ref');
+                    
+                    // Nếu session bị mất, thử lấy ID từ TxnRef của VNPAY trả về (ID đơn hàng sẽ ở trước dấu _)
+                    if (!$donHangId) {
+                         $txnRef = $request->input('vnp_TxnRef');
+                         $parts = explode('_', $txnRef);
+                         $donHangId = $parts[0];
+                    }
+
+                    $donHang = DonHang::findOrFail($donHangId);
+
                     // 1. Tìm hoặc tạo phương thức thanh toán VNPAY
                     $thanhToan = ThanhToan::firstOrCreate(
-                        ['phuong_thuc' => 'VNPAY'],
+                        ['phuong_thuc' => 'Thanh toán VNPAY'],
                         ['trang_thai' => 'Đã thanh toán']
                     );
 
-                    // 2. Lấy thông tin giỏ hàng
-                    $cartItems = GioHang::with('sach')->where('nguoi_dung_id', Auth::id())->get();
-                    $total = 0;
-                    foreach ($cartItems as $item) {
-                        $total += $item->sach->gia * $item->so_luong;
-                    }
-
-                    // 3. Tạo Đơn hàng mới
-                    $donHang = DonHang::create([
-                        'nguoi_dung_id' => Auth::id(),
+                    // 2. Cập nhật Đơn hàng (ĐÃ được tạo ở CartController) thay vì tạo mới
+                    $donHang->update([
                         'thanh_toan_id' => $thanhToan->id,
-                        'tong_tien' => $total,
-                        'trang_thai' => 'Chờ duyệt', // Trạng thái mặc định chờ duyệt
-                        'dia_chi_giao_hang' => 'Thanh toán trực tuyến VNPAY', // Bạn có thể bổ sung form nhập địa chỉ trước khi thanh toán
+                        'trang_thai' => 'Chờ duyệt',
                     ]);
 
-                    // 4. Lưu Chi tiết đơn hàng
-                    foreach ($cartItems as $item) {
-                        ChiTietDonHang::create([
-                            'don_hang_id' => $donHang->id,
-                            'sach_id' => $item->sach_id,
-                            'so_luong' => $item->so_luong,
-                            'don_gia' => $item->sach->gia,
-                        ]);
-                    }
+                    // (Chi tiết đơn hàng và tính phần trăm đã được xử lý ở CartController lúc create!)
 
-                    // 5. Xoá giỏ hàng
-                    GioHang::where('nguoi_dung_id', Auth::id())->delete();
+                    // 3. Xoá giỏ hàng sau khi thanh toán thành công
+                    GioHang::where('nguoi_dung_id', $donHang->nguoi_dung_id)->delete();
 
                     DB::commit();
+                    
+                    // Xóa vnpay session cho sạch
+                    session()->forget(['vnpay_don_hang_id', 'vnpay_txn_ref']);
 
                     return redirect()->route('vnpay.success', ['id' => $donHang->id]);
 
@@ -165,7 +160,23 @@ class VnPayController extends Controller
                     return redirect()->route('cart.index')->with('error', 'Lỗi hệ thống khi lưu đơn hàng: ' . $e->getMessage());
                 }
             } else {
-                return redirect()->route('cart.index')->with('error', 'Lỗi trong quá trình thanh toán qua VNPAY!');
+                // VNPAY thanh toán thất bại/bị hủy
+                // Ta nên lấy DonHang và cập nhật trạng thái là "Đã hủy" hoặc xóa nó
+                $donHangId = session('vnpay_txn_ref') ?? explode('_', $request->input('vnp_TxnRef'))[0];
+                if ($donHangId) {
+                    $donHang = DonHang::find($donHangId);
+                    if ($donHang) {
+                        // Khôi phục lại sách
+                        foreach($donHang->chiTietDonHangs as $ct) {
+                            $ct->sach->increment('so_luong', $ct->so_luong);
+                        }
+                        if ($donHang->maGiamGia) {
+                            $donHang->maGiamGia->increment('so_luong');
+                        }
+                        $donHang->update(['trang_thai' => 'Đã hủy']);
+                    }
+                }
+                return redirect()->route('cart.index')->with('error', 'Bạn đã hủy thanh toán hoặc giao dịch qua VNPAY bị lỗi!');
             }
         } else {
             return redirect()->route('cart.index')->with('error', 'Chữ ký số VNPAY không hợp lệ!');

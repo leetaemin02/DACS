@@ -14,6 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->trustProxies(at: '*');
         $middleware->alias([
             'admin' => \App\Http\Middleware\AdminMiddleware::class,
+            'ip.whitelist' => \App\Http\Middleware\IpWhitelistMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

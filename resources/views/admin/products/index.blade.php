@@ -6,6 +6,31 @@
     <a href="{{ route('admin.products.create') }}" style="background: var(--primary); color: white; padding: 0.75rem 1.5rem; border-radius: 0.5rem; text-decoration: none; font-weight: 600;">+ Thêm sản phẩm</a>
 </div>
 
+<!-- Ô tìm kiếm sản phẩm -->
+<div style="margin-bottom: 1.5rem;">
+    <form action="{{ route('admin.products') }}" method="GET" style="display: flex; gap: 0.5rem; align-items: center;">
+        <div style="position: relative; flex: 1; max-width: 400px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%);">
+                <circle cx="11" cy="11" r="8"></circle>
+                <path d="m21 21-4.3-4.3"></path>
+            </svg>
+            <input type="text" name="search" value="{{ request('search') }}" placeholder="Tìm theo tên sách hoặc tác giả..."
+                style="width: 100%; padding: 0.7rem 0.75rem 0.7rem 2.5rem; border: 1px solid #e2e8f0; border-radius: 0.5rem; font-size: 0.9rem; outline: none; transition: border-color 0.2s; background: white;"
+                onfocus="this.style.borderColor='#4f46e5'" onblur="this.style.borderColor='#e2e8f0'">
+        </div>
+        <button type="submit" style="padding: 0.7rem 1.25rem; background: #4f46e5; color: white; border: none; border-radius: 0.5rem; font-weight: 600; cursor: pointer; font-size: 0.9rem; transition: background 0.2s;"
+            onmouseover="this.style.background='#4338ca'" onmouseout="this.style.background='#4f46e5'">Tìm kiếm</button>
+        @if(request('search'))
+        <a href="{{ route('admin.products') }}" style="padding: 0.7rem 1rem; background: #f1f5f9; color: #64748b; border-radius: 0.5rem; text-decoration: none; font-size: 0.9rem; font-weight: 500; transition: background 0.2s;"
+            onmouseover="this.style.background='#e2e8f0'" onmouseout="this.style.background='#f1f5f9'">Xóa lọc</a>
+        @endif
+    </form>
+    @if(request('search'))
+    <p style="margin-top: 0.5rem; color: #64748b; font-size: 0.85rem;">
+        Kết quả tìm kiếm cho "<strong>{{ request('search') }}</strong>" — {{ $products->total() }} sản phẩm
+    </p>
+    @endif
+</div>
 <div class="table-card">
     <table>
         <thead>

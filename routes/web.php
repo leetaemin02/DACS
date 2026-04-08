@@ -41,6 +41,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/cart/add', [CartController::class, 'apiAdd'])->name('api.cart.add');
         Route::delete('/cart/remove/{id}', [CartController::class, 'apiRemove'])->name('api.cart.remove');
         Route::post('/reviews', [ReviewController::class, 'store'])->name('api.reviews.store');
+        Route::post('/coupons/apply', [CartController::class, 'applyCoupon'])->name('api.coupons.apply');
     });
 
     // Profile Routes
@@ -71,7 +72,7 @@ Route::post('/dang-xuat', [AuthController::class, 'logout'])
     ->middleware('auth');
 
 // Admin Routes
-Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'admin', 'ip.whitelist'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
 
 // Quản lý người dùng
@@ -96,4 +97,12 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('/reviews/reply/{id}', [AdminController::class, 'replyReview'])->name('reviews.reply');
     Route::delete('/reviews/reply/{id}', [AdminController::class, 'deleteReplyReview'])->name('reviews.reply.delete');
     Route::delete('/reviews/destroy/{id}', [AdminController::class, 'destroyReview'])->name('reviews.destroy');
+
+    // Quản lý mã giảm giá
+    Route::get('/coupons', [AdminController::class, 'coupons'])->name('coupons');
+    Route::get('/coupons/create', [AdminController::class, 'createCoupon'])->name('coupons.create');
+    Route::post('/coupons/store', [AdminController::class, 'storeCoupon'])->name('coupons.store');
+    Route::get('/coupons/edit/{id}', [AdminController::class, 'editCoupon'])->name('coupons.edit');
+    Route::post('/coupons/update/{id}', [AdminController::class, 'updateCoupon'])->name('coupons.update');
+    Route::delete('/coupons/destroy/{id}', [AdminController::class, 'destroyCoupon'])->name('coupons.destroy');
 });

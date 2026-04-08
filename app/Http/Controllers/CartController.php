@@ -7,7 +7,9 @@ use App\Models\GioHang;
 use App\Models\Sach;
 use App\Models\DonHang;
 use App\Models\ChiTietDonHang;
+use App\Models\ThanhToan;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class CartController extends Controller
 {
@@ -125,6 +127,35 @@ class CartController extends Controller
             'message' => 'Đã xóa khỏi giỏ hàng!'
         ]);
     }
+
+    public function applyCoupon(Request $request)
+    {
+        $code = trim($request->input('code'));
+        $coupon = \App\Models\MaGiamGia::where('ma_code', $code)->first();
+
+        if (!$coupon) {
+            return response()->json(['success' => false, 'message' => 'Mã giảm giá không tồn tại.']);
+        }
+
+        if ($coupon->so_luong <= 0) {
+            return response()->json(['success' => false, 'message' => 'Mã giảm giá đã hết lượt sử dụng.']);
+        }
+
+        if ($coupon->ngay_het_han && \Carbon\Carbon::parse($coupon->ngay_het_han)->isPast()) {
+            return response()->json(['success' => false, 'message' => 'Mã giảm giá đã hết hạn.']);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Áp dụng mã thành công!',
+            'coupon' => [
+                'id' => $coupon->id,
+                'so_tien_giam' => $coupon->so_tien_giam,
+                'phan_tram_giam' => $coupon->phan_tram_giam,
+            ]
+        ]);
+    }
+
     public function checkout()
     {
         $data = $this->getCartData();
@@ -151,33 +182,99 @@ class CartController extends Controller
             return redirect()->route('cart.index')->with('error', 'Giỏ hàng của bạn đang trống.');
         }
 
-        $dia_chi_day_du = "Tên: " . $request->name . ", SĐT: " . $request->phone . ", Địa chỉ: " . $request->address;
-
-        $donHang = DonHang::create([
-            'nguoi_dung_id' => Auth::id(),
-            'tong_tien' => $data['total'],
-            'dia_chi_giao_hang' => $dia_chi_day_du,
-            'trang_thai' => 'Chờ xử lý'
-        ]);
-
+        // Kiểm tra tồn kho trước khi đặt hàng
         foreach ($data['cartItems'] as $item) {
-            ChiTietDonHang::create([
-                'don_hang_id' => $donHang->id,
-                'sach_id' => $item->sach_id,
-                'so_luong' => $item->so_luong,
-                'don_gia' => $item->sach->gia
+            if ($item->sach->so_luong < $item->so_luong) {
+                return redirect()->route('cart.index')->with('error', 'Sách "' . $item->sach->ten_sach . '" chỉ còn ' . $item->sach->so_luong . ' cuốn trong kho.');
+            }
+        }
+
+        $dia_chi_day_du = $request->address;
+
+        // Cập nhật thông tin người dùng nếu cần thiết
+        $user = Auth::user();
+        if (!$user->ho_ten || !$user->so_dien_thoai || !$user->dia_chi) {
+            $user->update([
+                'ho_ten' => $request->name,
+                'so_dien_thoai' => $request->phone,
+                'dia_chi' => $request->address,
             ]);
         }
 
-        if ($request->payment == 'vnpay') {
-            // Lưu thông tin đơn hàng tạm vào session để VnPayController có thể lấy thông tin
-            session(['vnpay_don_hang_id' => $donHang->id]);
-            return redirect()->route('vnpay.payment');
+        // --- Xử lý mã giảm giá ---
+        $maGiamGiaId = $request->input('ma_giam_gia_id');
+        $tongTien = $data['total'];
+
+        if ($maGiamGiaId) {
+            $coupon = \App\Models\MaGiamGia::find($maGiamGiaId);
+            if ($coupon && $coupon->so_luong > 0 && (!$coupon->ngay_het_han || !\Carbon\Carbon::parse($coupon->ngay_het_han)->isPast())) {
+                $discount = 0;
+                if ($coupon->so_tien_giam !== null && $coupon->so_tien_giam > 0) {
+                    $discount = $coupon->so_tien_giam;
+                } elseif ($coupon->phan_tram_giam !== null && $coupon->phan_tram_giam > 0) {
+                    $discount = $tongTien * ($coupon->phan_tram_giam / 100);
+                }
+                
+                $tongTien -= $discount;
+                if ($tongTien < 0) $tongTien = 0;
+            } else {
+                $maGiamGiaId = null; // Mã không hợp lệ
+            }
         }
 
-        // Nếu là COD thì xóa giỏ hàng
-        GioHang::where('nguoi_dung_id', Auth::id())->delete();
+        DB::beginTransaction();
+        try {
+            $donHang = DonHang::create([
+                'nguoi_dung_id' => $user->id,
+                'tong_tien' => $tongTien,
+                'dia_chi_giao_hang' => $dia_chi_day_du,
+                'trang_thai' => 'Chờ xử lý',
+                'ma_giam_gia_id' => $maGiamGiaId
+            ]);
 
-        return redirect('/')->with('success', 'Đặt hàng thành công');
+            if ($maGiamGiaId && isset($coupon)) {
+                 $coupon->decrement('so_luong');
+            }
+
+            foreach ($data['cartItems'] as $item) {
+                ChiTietDonHang::create([
+                    'don_hang_id' => $donHang->id,
+                    'sach_id' => $item->sach_id,
+                    'so_luong' => $item->so_luong,
+                    'don_gia' => $item->sach->gia
+                ]);
+
+                // Trừ số lượng tồn kho
+                $item->sach->decrement('so_luong', $item->so_luong);
+            }
+
+            if ($request->payment == 'vnpay') {
+                DB::commit();
+                session(['vnpay_don_hang_id' => $donHang->id]);
+                return redirect()->route('vnpay.payment');
+            }
+
+            // --- XỬ LÝ THANH TOÁN COD ---
+            $thanhToan = ThanhToan::firstOrCreate(
+                ['phuong_thuc' => DonHang::PAYMENT_COD],
+                ['trang_thai' => 'Hoạt động']
+            );
+
+            $donHang->update([
+                'thanh_toan_id' => $thanhToan->id,
+                'trang_thai' => DonHang::STATUS_PENDING
+            ]);
+
+            // Xóa giỏ hàng sau khi đặt thành công
+            GioHang::where('nguoi_dung_id', Auth::id())->delete();
+
+            DB::commit();
+
+            return redirect()->route('vnpay.success', ['id' => $donHang->id]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->route('cart.index')->with('error', 'Lỗi khi đặt hàng: ' . $e->getMessage());
+        }
     }
 }

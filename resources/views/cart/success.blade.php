@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container" style="padding-top: 5rem; padding-bottom: 5rem;">
-    <div style="max-width: 800px; margin: 0 auto; background: white; border-radius: 1.5rem; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1); overflow: hidden;">
+    <div style="max-width: 900px; margin: 0 auto; background: white; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1); overflow: hidden;">
 
         <!-- Header Success -->
         <div style="background: #4f46e5; padding: 3rem 2rem; text-align: center; color: white;">
@@ -64,6 +64,14 @@
                     <span style="color: #64748b;">Trạng thái đơn hàng:</span>
                     <span style="background: #fef3c7; color: #92400e; padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.75rem; font-weight: 700;">{{ $donHang->trang_thai }}</span>
                 </div>
+                @if($donHang->maGiamGia)
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem;">
+                    <span style="color: #64748b;">Mã giảm giá ({{ $donHang->maGiamGia->ma_code }}):</span>
+                    <span style="font-weight: 600; color: #ef4444;">
+                        -{{ $donHang->maGiamGia->so_tien_giam ? number_format($donHang->maGiamGia->so_tien_giam, 0) . 'đ' : $donHang->maGiamGia->phan_tram_giam . '%' }}
+                    </span>
+                </div>
+                @endif
                 <div style="display: flex; justify-content: space-between; margin-top: 1rem; padding-top: 1rem; border-top: 1px dashed #cbd5e1;">
                     <span style="font-size: 1.125rem; font-weight: 700; color: #1e293b;">Tổng số tiền:</span>
                     <span style="font-size: 1.25rem; font-weight: 800; color: #4f46e5;">{{ number_format($donHang->tong_tien, 0) }}đ</span>

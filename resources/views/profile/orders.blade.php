@@ -86,10 +86,10 @@
                             
                             <div class="order-footer">
                                 <div>
-                                    @if($order->dia_chi_giao_hang)
+                                    @if($order->thanhToan)
                                         <div style="font-size: 0.875rem; color: var(--text-secondary);">
                                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 4px;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                                            {{ $order->dia_chi_giao_hang }}
+                                            {{ $order->thanhToan->phuong_thuc }}
                                         </div>
                                     @endif
                                 </div>
