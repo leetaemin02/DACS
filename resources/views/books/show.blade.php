@@ -2,66 +2,83 @@
 
 @section('content')
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&family=Noto+Serif:ital,wght@0,400;0,700;1,400&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&display=swap');
+    
     .book-detail-page {
-        font-family: 'Manrope', sans-serif;
+        font-family: 'Outfit', sans-serif;
+        color: #1a1a1a;
     }
     .book-detail-grid {
         display: grid;
-        grid-template-columns: 4fr 8fr;
-        gap: 4rem;
-        margin-bottom: 4rem;
+        grid-template-columns: 3.5fr 6.5fr;
+        gap: 3rem;
+        margin-bottom: 3rem;
         align-items: start;
     }
     .book-detail-intro {
-        background-color: #fbf9f4;
-        border-radius: 1.5rem;
-        padding: 3rem 4rem;
-        box-shadow: inset 0 2px 5px rgba(0,0,0,0.05), 0 10px 30px rgba(0,37,24,0.05);
+        background-color: #fafafa;
+        border-radius: 1rem;
+        padding: 3rem;
         margin-bottom: 4rem;
-        border: 1px solid rgba(0,37,24,0.05);
+        border: 1px solid rgba(0,0,0,0.03);
     }
     .book-serif-font {
-        font-family: 'Noto Serif', serif;
+        font-family: 'Newsreader', serif;
     }
-    .book-image-wrapper::before {
+    .book-image-wrapper {
+        position: relative;
+        padding-right: 1.5rem;
+    }
+    .book-image-wrapper::after {
         content: '';
         position: absolute;
-        top: -1rem; left: -1rem; right: -1rem; bottom: -1rem;
-        background-color: #f5f3ee;
-        border-radius: 0.75rem;
+        top: 1rem; left: 1rem; right: 0.5rem; bottom: -1rem;
+        background-color: #f3f4f6;
+        border-radius: 0.5rem;
         z-index: -1;
-        transform: rotate(1.5deg);
-        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
     }
     .btn-premium-cart {
-        padding: 0.75rem 2rem;
-        background: linear-gradient(135deg, #002518 0%, #003d2a 100%);
+        padding: 0.875rem 1.75rem;
+        background-color: #111827;
         color: #ffffff;
-        border-radius: 0.75rem;
-        font-weight: 700;
-        font-size: 1rem;
-        border: none;
+        border-radius: 0.5rem;
+        font-weight: 500;
+        font-size: 0.95rem;
+        border: 1px solid #000;
         cursor: pointer;
-        box-shadow: 0 10px 15px -3px rgba(0,37,24,0.2), 0 4px 6px -2px rgba(0,37,24,0.1);
         display: flex;
         align-items: center;
         gap: 0.5rem;
-        transition: transform 0.2s, box-shadow 0.2s;
+        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
     .btn-premium-cart:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 15px 25px -5px rgba(0,37,24,0.3), 0 8px 10px -6px rgba(0,37,24,0.1);
+        background-color: #1f2937;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+    }
+    .btn-premium-cart:active {
+        transform: translateY(1px);
+        box-shadow: 0 1px 2px rgba(0,0,0,0.1);
     }
     .btn-premium-input {
-        width: 3.5rem;
+        width: 3rem;
         background: transparent;
         border: none;
         text-align: center;
-        font-weight: 700;
-        color: #002518;
+        font-weight: 500;
+        color: #111827;
         outline: none;
         font-size: 1rem;
+    }
+    .input-wrapper {
+        display: flex; align-items: center; 
+        background-color: #f8fafc; 
+        border-radius: 0.5rem; 
+        padding: 0.25rem; 
+        border: 1px solid #e2e8f0; 
+        box-shadow: inset 0 1px 2px rgba(0,0,0,0.02);
     }
     @media (max-width: 768px) {
         .book-detail-grid {
@@ -69,67 +86,66 @@
             gap: 2rem;
         }
         .book-detail-intro {
-            padding: 2rem 1.5rem;
+            padding: 1.5rem;
         }
     }
 </style>
 
-<div class="container book-detail-page" style="padding-top: 2rem; padding-bottom: 2rem;">
+<div class="container book-detail-page" style="padding-top: 2rem; padding-bottom: 2rem; max-width: 1100px; margin: 0 auto;">
     <div class="book-detail-grid">
         <!-- Book Image -->
-        <div style="position: relative; z-index: 1; max-width: 320px;">
-            <div class="book-image-wrapper" style="position: relative;">
-                <div style="aspect-ratio: 2/3; overflow: hidden; border-radius: 0.5rem; box-shadow: 0px 30px 60px rgba(0,37,24,0.2); background-color: #e4e2dd;">
+        <div style="position: relative; z-index: 1;">
+            <div class="book-image-wrapper">
+                <div style="aspect-ratio: 2/3; overflow: hidden; border-radius: 0.5rem; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.15); background-color: #f8fafc; border: 1px solid rgba(0,0,0,0.05);">
                     @if($book->hinh_anh)
                     <img src="{{ Str::startsWith($book->hinh_anh, ['http://', 'https://']) ? $book->hinh_anh : asset('storage/' . $book->hinh_anh) }}"
                         alt="{{ $book->ten_sach }}"
-                        style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s;">
+                        style="width: 100%; height: 100%; object-fit: cover;">
                     @else
-                    <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #64748b; font-weight: 600;">No Image Available</div>
+                    <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #64748b; font-weight: 500;">Chưa có ảnh</div>
                     @endif
                 </div>
             </div>
         </div>
 
         <!-- Book Details -->
-        <div style="display: flex; flex-direction: column; gap: 1.5rem; padding-top: 0.5rem;">
+        <div style="display: flex; flex-direction: column; gap: 1rem; padding-top: 1rem;">
             <div>
                 <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
-                    <span style="padding: 0.25rem 0.75rem; background-color: #a7f2cf; color: #00513a; border-radius: 9999px; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; display: inline-flex; align-items: center; gap: 0.4rem;">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"></path></svg>
-                        Thể loại: {{ $book->the_loai }}
+                    <span style="padding: 0.25rem 0.6rem; background-color: #f1f5f9; color: #475569; border-radius: 0.25rem; font-size: 0.7rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; border: 1px solid #e2e8f0;">
+                        {{ $book->the_loai }}
                     </span>
-                    <div style="display: flex; align-items: center; gap: 0.25rem; color: #434749;">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" {{ $book->so_luong > 0 ? 'stroke="#00513a"' : 'stroke="#ba1a1a"' }} stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            @if($book->so_luong > 0)
-                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                            <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                            @else
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <line x1="15" y1="9" x2="9" y2="15"></line>
-                            <line x1="9" y1="9" x2="15" y2="15"></line>
-                            @endif
-                        </svg>
-                        <span style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: {{ $book->so_luong > 0 ? '#00513a' : '#ba1a1a' }}">{{ $book->so_luong > 0 ? 'Còn hàng' : 'Hết hàng' }}</span>
+                    <div style="display: flex; align-items: center; gap: 0.35rem; font-size: 0.75rem; font-weight: 500; letter-spacing: 0.02em; color: {{ $book->so_luong > 0 ? '#059669' : '#dc2626' }}">
+                        @if($book->so_luong > 0)
+                        <div style="width: 6px; height: 6px; border-radius: 50%; background-color: #059669; box-shadow: 0 0 0 2px rgba(5,150,105,0.2);"></div>
+                        Còn hàng
+                        @else
+                        <div style="width: 6px; height: 6px; border-radius: 50%; background-color: #dc2626; box-shadow: 0 0 0 2px rgba(220,38,38,0.2);"></div>
+                        Hết hàng
+                        @endif
                     </div>
                 </div>
-                <h1 class="book-serif-font" style="font-size: 2.5rem; font-weight: 700; color: #002518; line-height: 1.15; margin-bottom: 0.5rem; letter-spacing: -0.01em;">{{ $book->ten_sach }}</h1>
-                <p class="book-serif-font" style="font-size: 1.25rem; color: #586768; font-style: italic;">bởi <span style="font-weight: 600; color: #002518;">{{ $book->tacGias->pluck('ten_tac_gia')->implode(', ') }}</span></p>
+                <h1 class="book-serif-font" style="font-size: 2.25rem; font-weight: 500; color: #0f172a; line-height: 1.2; margin-bottom: 0.25rem; letter-spacing: -0.015em;">{{ $book->ten_sach }}</h1>
+                <p style="font-size: 1rem; color: #64748b;">
+                    bởi <span style="font-weight: 500; color: #334155;">{{ $book->tacGias->pluck('ten_tac_gia')->implode(', ') }}</span>
+                </p>
             </div>
 
-            <div style="display: flex; align-items: baseline; gap: 1rem;">
-                <span class="book-serif-font" style="font-size: 2rem; font-weight: 700; color: #002518;">{{ number_format($book->gia, 0) }}đ</span>
+            <div style="margin-top: 0.5rem; display: flex; align-items: baseline; gap: 0.5rem;">
+                <span class="book-serif-font" style="font-size: 1.75rem; font-weight: 500; color: #0f172a; letter-spacing: -0.02em;">{{ number_format($book->gia, 0) }}đ</span>
             </div>
 
-            <form id="add-to-cart-form" style="padding-top: 1rem; border-top: 1px solid rgba(195,199,201,0.3); margin-top: 0.5rem;">
+            <form id="add-to-cart-form" style="padding-top: 1.5rem; margin-top: 1rem; border-top: 1px solid #f1f5f9;">
                 @csrf
                 <input type="hidden" name="sach_id" id="sach_id" value="{{ $book->id }}">
                 <div style="display: flex; align-items: center; gap: 1rem;">
-                    <div style="display: flex; align-items: center; background-color: #e4e2dd; border-radius: 0.65rem; padding: 0.4rem; border: 1px solid rgba(195,199,201,0.5); box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);">
+                    <div class="input-wrapper">
+                        <button type="button" onclick="document.getElementById('so_luong').stepDown()" style="background:none; border:none; padding:4px 8px; cursor:pointer; color:#64748b;">-</button>
                         <input type="number" name="so_luong" id="so_luong" min="1" value="1" class="btn-premium-input">
+                        <button type="button" onclick="document.getElementById('so_luong').stepUp()" style="background:none; border:none; padding:4px 8px; cursor:pointer; color:#64748b;">+</button>
                     </div>
                     <button type="submit" class="btn-premium-cart">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 0 0 0 2-1.61L23 6H6"></path></svg>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 0 0 0 2-1.61L23 6H6"></path></svg>
                         Thêm vào giỏ hàng
                     </button>
                 </div>
@@ -139,20 +155,17 @@
 
     <!-- Giới Thiệu Sách Section -->
     <section class="book-detail-intro">
-        <div style="max-width: 50rem; margin: 0 auto;">
-            <div style="display: flex; align-items: center; justify-content: center; gap: 1.25rem; margin-bottom: 2.5rem;">
-                <div style="flex: 1; height: 1px; background: linear-gradient(90deg, transparent, rgba(195,199,201,0.5));"></div>
-                <div style="display: flex; align-items: center; gap: 0.5rem; color: #002518;">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"></path>
-                    </svg>
-                    <h2 class="book-serif-font" style="font-size: 1.75rem; font-weight: 700; font-style: italic; letter-spacing: -0.01em; margin: 0;">Giới thiệu sách</h2>
+        <div style="max-width: 650px; margin: 0 auto;">
+            <div style="display: flex; align-items: center; justify-content: center; gap: 1rem; margin-bottom: 2rem;">
+                <div style="flex: 1; height: 1px; background: linear-gradient(90deg, transparent, #e2e8f0);"></div>
+                <div style="display: flex; align-items: center; gap: 0.5rem; color: #0f172a;">
+                    <h2 class="book-serif-font" style="font-size: 1.5rem; font-weight: 500; font-style: italic; letter-spacing: -0.01em; margin: 0;">Giới thiệu sách</h2>
                 </div>
-                <div style="flex: 1; height: 1px; background: linear-gradient(270deg, transparent, rgba(195,199,201,0.5));"></div>
+                <div style="flex: 1; height: 1px; background: linear-gradient(270deg, transparent, #e2e8f0);"></div>
             </div>
             
-            <div class="book-serif-font" style="color: #434749; line-height: 1.8; font-size: 1.1rem; white-space: pre-line; text-align: justify;">
-                <span class="book-serif-font" style="font-size: 3.5rem; font-weight: 700; color: #002518; float: left; line-height: 0.8; margin-right: 0.5rem; margin-top: 0.25rem;">{{ Str::substr(trim($book->mo_ta ?? 'Chưa có thông tin'), 0, 1) }}</span>{{ Str::substr(trim($book->mo_ta ?? 'Chưa có thông tin'), 1) }}
+            <div style="color: #475569; line-height: 1.75; font-size: 1.05rem; white-space: pre-line;">
+                <span class="book-serif-font" style="font-size: 2.5rem; color: #0f172a; float: left; line-height: 0.9; margin-right: 0.5rem; margin-top: 0.25rem;">{{ Str::substr(trim($book->mo_ta ?? 'Chưa có thông tin'), 0, 1) }}</span>{{ Str::substr(trim($book->mo_ta ?? 'Chưa có thông tin'), 1) }}
             </div>
         </div>
     </section>
