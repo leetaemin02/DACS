@@ -28,13 +28,35 @@ class IpWhitelistMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        // Lấy IP của người dùng đang request
+        // Lấy IP mặc định của request
         $clientIp = $request->ip();
 
-        // Kiểm tra xem IP có nằm trong danh sách cho phép không
+        // Trên Render, IP thật của người dùng luôn được nhét vào X-Forwarded-For
+        // Do TrustProxies đôi khi chưa cấu hình đủ header nên ta lấy thủ công an toàn ở đây
+        if ($forwarded = $request->header('X-Forwarded-For')) {
+            // X-Forwarded-For có thể là chuỗi "IP_Client, IP_Proxy_1, IP_Proxy_2"
+            // IP thật của user luôn là IP nằm đầu tiên mạng lưới (bên trái cùng) hoặc do Render cung cấp ở vị trí cuối cùng tuỳ config.
+            // Để an toàn, ta lấy theo mảng và kiểm tra xem có IP nào trong mảng nằm ở whitelist không.
+            $ips = array_map('trim', explode(',', $forwarded));
+            
+            // Tìm xem trong chuỗi Forwarded IP có cái nào khớp Whitelist không
+            $hasValidIp = false;
+            foreach ($ips as $ip) {
+                if (in_array($ip, $this->whitelist)) {
+                    $hasValidIp = true;
+                    $clientIp = $ip; // Gán lại IP để log/hiển thị
+                    break;
+                }
+            }
+            
+            if ($hasValidIp) {
+                return $next($request);
+            }
+        }
+
+        // Kiểm tra IP gốc (nếu không chạy qua proxy hoặc chạy ở localhost)
         if (!in_array($clientIp, $this->whitelist)) {
-            // Ném ra trang lỗi 403 (Kèm IP để bạn debug)
-            abort(403, "Truy cập bị từ chối. IP của bạn hiện tại hệ thống nhận được là: " . $clientIp);
+            abort(403, "Truy cập bị từ chối. Lỗi IP: " . $clientIp . " (Forwarded: " . $request->header('X-Forwarded-For', 'None') . ")");
         }
 
         return $next($request);
