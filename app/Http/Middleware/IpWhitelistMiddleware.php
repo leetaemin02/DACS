@@ -33,8 +33,8 @@ class IpWhitelistMiddleware
 
         // Kiểm tra xem IP có nằm trong danh sách cho phép không
         if (!in_array($clientIp, $this->whitelist)) {
-            // Ném ra trang lỗi 403 (Cấm truy cập)
-            abort(403, 'Truy cập bị từ chối.');
+            // Ném ra trang lỗi 403 (Kèm IP để bạn debug)
+            abort(403, "Truy cập bị từ chối. IP của bạn hiện tại hệ thống nhận được là: " . $clientIp);
         }
 
         return $next($request);
