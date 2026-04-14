@@ -16,6 +16,7 @@ class IpWhitelistMiddleware
     protected $whitelist = [
         '127.0.0.1',
         '::1',
+        '192.168.1.66',
         // '192.168.1.100', // Ví dụ IP máy trạm
         // '203.113.xxx.yyy', // Ví dụ IP Public văn phòng
     ];

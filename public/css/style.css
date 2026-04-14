@@ -956,6 +956,7 @@ button,
     display: flex;
     gap: 4px;
     margin-top: 0.5rem;
+    margin-right: 15px;
 }
 
 .rating-count {
@@ -1002,8 +1003,10 @@ button,
 }
 
 .review-item {
+    background-color: rgb(186, 230, 246);
+    border-radius: 20px;
     padding: 2rem 0;
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: 3px solid var(--border-color);
 }
 
 .review-item:last-child {
@@ -1020,7 +1023,7 @@ button,
 .user-avatar {
     width: 44px;
     height: 44px;
-    background: linear-gradient(135deg, var(--primary-color), #818cf8);
+    background: var(--primary-color);
     color: white;
     border-radius: 50%;
     display: flex;
@@ -1028,6 +1031,7 @@ button,
     justify-content: center;
     font-weight: 700;
     font-size: 1rem;
+    margin-left: 20px;
     box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);
 }
 
@@ -1046,6 +1050,7 @@ button,
     color: var(--text-primary);
     line-height: 1.6;
     margin-top: 0.75rem;
+    margin-left: 20px;
     font-size: 1.05rem;
 }
 

@@ -38,6 +38,7 @@
                 <th>Hình ảnh</th>
                 <th>Tên sách</th>
                 <th>Giá</th>
+                <th>Tồn kho</th>
                 <th>Tác giả</th>
                 <th>Thao tác</th>
             </tr>
@@ -51,7 +52,8 @@
                 </td>
                 <td style="font-weight: 600;">{{ $product->ten_sach }}</td>
                 <td>{{ number_format($product->gia, 0) }}đ</td>
-                <td>{{ $product->tacGias->pluck('ten_tac_gia')->implode(', ') }}</td>
+                <td>{{ $product->so_luong }}</td>
+                <td>{{ $product->tacGias->pluck('ten_tac_gia')->unique()->implode(', ') }}</td>
                 <td>
                     <div style="display: flex; gap: 0.5rem;">
                         <a href="{{ route('admin.products.edit', ['id' => $product->id, 'page' => $products->currentPage()]) }}" style="color: #4f46e5; text-decoration: none;">Sửa</a>

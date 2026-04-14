@@ -16,7 +16,7 @@
         align-items: start;
     }
     .book-detail-intro {
-        background-color: #fafafa;
+        background-color: #f3fdb6ff;
         border-radius: 1rem;
         padding: 3rem;
         margin-bottom: 4rem;
