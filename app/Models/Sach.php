@@ -13,6 +13,7 @@ class Sach extends Model
 
     protected $fillable = [ // Các trường được phép ghi dữ liệu
         'ten_sach',
+        'the_loai',
         'tac_gia',
         'mo_ta',
         'gia',

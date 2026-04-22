@@ -16,6 +16,11 @@
                 <input type="text" name="ten_sach" value="{{ $product->ten_sach }}" required style="width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 0.5rem;">
             </div>
 
+            <div class="form-group">
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Thể loại</label>
+                <input type="text" name="the_loai" value="{{ $product->the_loai }}" required style="width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 0.5rem;">
+            </div>
+
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                 <div class="form-group">
                     <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Giá (VND)</label>

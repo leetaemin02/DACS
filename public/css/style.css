@@ -1675,9 +1675,38 @@ button,
 }
 
 .trending-subtitle {
-    color: rgba(255, 255, 255, 0.7);
-    font-size: 0.95rem;
+    color: white;
+    font-size: 1.2rem;
     margin: 0;
+}
+
+.view-more-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    color: white !important;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.view-more-btn:hover {
+    background: white;
+    color: var(--primary-color) !important;
+    transform: translateX(5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.view-more-btn.alt {
+    background: var(--primary-color);
+    border: none;
+}
+
+.view-more-btn.alt:hover {
+    background: #4338ca;
+    color: white !important;
 }
 
 .trending-grid {
@@ -1834,8 +1863,16 @@ button,
 }
 
 .favorites-header {
-    text-align: center;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
     margin-bottom: 3rem;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.favorites-header-left {
+    text-align: left;
 }
 
 .favorites-header h2 {

@@ -36,8 +36,10 @@
             <div class="trending-header">
                 <div class="trending-header-left">
                     <h2>Đang Thịnh Hành</h2>
+                </div>      
+                <div class="trending-header-right">
+                    <a href="/categories" class="view-more-btn">Tìm hiểu thêm &rarr;</a>
                 </div>
-                <p class="trending-subtitle">Những cuốn sách được ưa chuộng nhất</p>
             </div>
 
             <div class="trending-grid">
@@ -79,8 +81,11 @@
     {{-- ==================== KHÁCH HÀNG YÊU THÍCH ==================== --}}
     <section id="favorites" class="favorites-section">
         <div class="favorites-header">
-            <h2>Khách Hàng Yêu Thích</h2>
-            <p class="favorites-subtitle">Những cuốn sách được đánh giá cao nhất bởi độc giả</p>
+            <div class="favorites-header-left">
+                <h2>Khách Hàng Yêu Thích</h2>
+                <p class="favorites-subtitle">Những cuốn sách được đánh giá cao nhất bởi độc giả</p>
+            </div>
+            <a href="/categories" class="view-more-btn alt">Tìm hiểu thêm &rarr;</a>
         </div>
 
         <div class="favorites-grid">

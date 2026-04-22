@@ -141,6 +141,7 @@ class AdminController extends Controller
     {
         $request->validate([
             'ten_sach' => 'required',
+            'the_loai' => 'required',
             'gia' => 'required|numeric',
             'authors' => 'nullable|array',
             'authors.*' => 'exists:tac_gia,id'
@@ -166,6 +167,7 @@ class AdminController extends Controller
     {
         $request->validate([
             'ten_sach' => 'required',
+            'the_loai' => 'required',
             'gia' => 'required|numeric',
             'authors' => 'nullable|array',
             'authors.*' => 'exists:tac_gia,id'
